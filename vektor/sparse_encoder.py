@@ -3,40 +3,30 @@ vektor/sparse_encoder.py
 """
 import binascii
 
-from vektor.token import encode_token_to_bytes, tokenize
+from vektor.tokenizer import Tokenizer
 
 
 # For demonstration purposes, let's define a simple class for Sparse Encoding
 class SparseEncoder:
-    def __init__(self):
-        self.dictionary = {}
+    def __init__(self, num_bits=16):
+        # num_bits determines the size of the quantization bucket
+        self.num_bits = num_bits
+        self.max_val = 2**num_bits - 1
+        self.token_map = {}
 
-    def fit(self, tokens):
-        for token in tokens:
-            if token not in self.dictionary:
-                self.dictionary[token] = len(self.dictionary)
-
-    def transform(self, tokens):
-        # Creating a sparse representation
-        encoded_tokens = []
-        for token in tokens:
-            # Using a dictionary to map tokens to indices
-            token_index = self.dictionary.get(token, None)
-            if token_index is not None:
-                # In a full implementation, this would be a sparse vector
-                encoded_tokens.append((token_index, 1))
-        return encoded_tokens
+    def quantize(self, encoded_token):
+        # Quantize the token to reduce its size
+        return min(encoded_token, self.max_val)
 
     def fit_transform(self, tokens):
-        self.fit(tokens)
-        return self.transform(tokens)
-
-
-# Quantization can be as simple as reducing the precision of the token index
-def quantize(token_index, num_bits=8):
-    # Assuming token_index is an integer that fits within the given bit width
-    max_val = 2**num_bits - 1
-    return min(token_index, max_val)
+        # Assigns a unique index to each unique token and quantizes it
+        quantized_tokens = []
+        for token in tokens:
+            if token not in self.token_map:
+                # Assign a new index if the token is not yet in the map
+                self.token_map[token] = len(self.token_map)
+            quantized_tokens.append(self.quantize(self.token_map[token]))
+        return quantized_tokens
 
 
 # This is a placeholder for the future integration of Model-Aware Encoding
@@ -50,18 +40,16 @@ def model_aware_encode(token, model):
 
 # Example usage
 if __name__ == "__main__":
-    text = "I know my remedy; I must go fetch the third--borough."
-    tokens = tokenize(text)
-    encoder = SparseEncoder()
-    sparse_vectors = encoder.fit_transform(tokens)
-    print("Sparse Encoding:", sparse_vectors)
+    text = "こんにちは！ これは単なるテストです。"
+    tokenizer = Tokenizer()
+    tokens = tokenizer.tokenize(text)
+    encoded_tokens = [tokenizer.encode_to_bytes(token) for token in tokens]
 
-    # Example of quantization
-    for token_index, _ in sparse_vectors:
-        print(
-            f"Quantized Token Index for '{tokens[token_index]}':", quantize(token_index)
-        )
+    # Assuming we want to quantize to 16-bit values for demonstration
+    sparse_encoder = SparseEncoder(num_bits=16)
+    sparse_encoded_tokens = sparse_encoder.fit_transform(encoded_tokens)
 
-    # Encoding tokens to bytes
-    for token in tokens:
-        print(f"Encoded '{token}' to bytes:", encode_token_to_bytes(token))
+    print("Tokens:", tokens)
+    print("Encoded tokens:", encoded_tokens)
+    print("Encoder map:", sparse_encoder.token_map)
+    print("Sparse Encoded Tokens:", sparse_encoded_tokens)
