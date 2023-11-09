@@ -3,3 +3,4 @@ html2text
 mdformat
 click
 tqdm
+pytest
