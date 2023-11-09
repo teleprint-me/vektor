@@ -1,5 +1,5 @@
 """
-test_sparse_encoder.py
+tests/test_sparse_encoder.py
 """
 import pytest
 

@@ -1,5 +1,5 @@
 """
-test_model.py
+tests/test_skip_gram_model.py
 """
 
 import pytest
