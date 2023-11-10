@@ -4,3 +4,6 @@ mdformat
 click
 tqdm
 pytest
+numpy
+scipy
+h5py
