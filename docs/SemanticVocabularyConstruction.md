@@ -1,78 +1,103 @@
 # Semantic Vocabulary Construction
 
-The creation of a vocabulary that combines words, characters, and subwords is
-crucial in retaining semantic meaning while ensuring computational efficiency.
-This document outlines a process for developing such a vocabulary.
+This document serves as a guide for developing a semantic vocabulary that
+integrates words, characters, and subwords, balancing semantic richness with
+computational efficiency. It outlines a methodical process for creating
+numerical representations of text data, suitable for various NLP applications.
 
 ## Process Overview
 
-The following steps outline the method for creating numerical representations of
-text data:
-
 ### 1. Tokenization
 
-Split text into tokens, which could be:
-
-- Full words
-- Subwords
-- Characters
+**Objective**: Split text into meaningful tokens, which can be full words,
+subwords, or characters.
 
 **Method**:
 
-- Begin by dividing based on whitespace and punctuation.
-- Apply further subdivision for special cases.
+- Start by dividing text based on whitespace and punctuation.
+- Further subdivide for special cases, like compound words or contractions.
 
 ### 2. Unique Identifier Assignment
 
-Assign a unique numerical identifier to each token using:
+**Objective**: Assign a unique numerical identifier to each token.
 
-- An incrementing index
-- A hash function
+**Method**:
+
+- Use an incrementing index or a hash function for unique identification.
 
 ### 3. Vector Representation
 
-**For words and subwords**:
+**Objective**: Represent tokens as vectors.
 
-- Utilize a sparse vector representation with one-hot encoding.
+**Method**:
 
-**For characters**:
-
-- Employ ASCII or Unicode code points.
+- For words and subwords: Use a sparse vector representation with one-hot
+  encoding.
+- For characters: Employ ASCII or Unicode code points.
 
 ### 4. Dimensionality Reduction
 
-Reduce the high-dimensional sparse vectors using techniques like:
+**Objective**: Reduce the high-dimensional vectors to more manageable sizes.
 
-- Principal Component Analysis (PCA)
-- Autoencoders
+**Method**:
+
+- Apply techniques like Principal Component Analysis (PCA) for linear
+  dimensionality reduction or Autoencoders for a non-linear approach.
 
 ### 5. Encoding Function
 
-Develop a deterministic function that maps tokens to dense vectors, adhering to
-the tokenization rules and the chosen dimensionality reduction method.
+**Objective**: Develop a deterministic function mapping tokens to dense vectors.
+
+**Method**:
+
+- Ensure the function adheres to the tokenization rules and chosen
+  dimensionality reduction method.
 
 ### 6. Clustering for Semantic Similarity (Optional)
 
-Perform clustering on the dense vectors to group semantically similar tokens,
-which aids in vocabulary size reduction.
+**Objective**: Group semantically similar tokens to aid in vocabulary size
+reduction.
+
+**Method**:
+
+- Perform clustering on the dense vectors using algorithms like k-means or
+  hierarchical clustering.
 
 ### 7. Vocabulary Construction
 
-Combine the dense vectors to form the final vocabulary, ready for use in
-numerical models.
+**Objective**: Combine dense vectors to form the final vocabulary.
+
+**Method**:
+
+- Integrate vectors ensuring coverage of all token types and maintaining
+  semantic integrity.
 
 ### 8. Consistency and Reliability
 
-Guarantee the encoding function's consistency and the vectors' reliability in
-representing tokens' semantic meaning.
+**Objective**: Ensure the encoding function's consistency and vectors'
+reliability.
+
+**Method**:
+
+- Regularly test and validate the representation accuracy of tokens' semantic
+  meaning.
+
+## Use Cases
+
+This semantic vocabulary can be integrated into NLP models for tasks such as:
+
+- Text classification
+- Sentiment analysis
+- Machine translation
 
 ## Conclusion
 
-This structured approach aims to blend the precision of character-level
-tokenization with the contextual richness of word-level representations,
-offering a robust solution for various NLP applications.
+By blending character-level precision with word-level context, this approach
+offers a robust solution for constructing semantic vocabularies in NLP. The
+process is designed to be adaptable, catering to a wide range of applications in
+the field.
 
 ---
 
-Please consider this document as a guide for developing a semantic vocabulary
-that can be integrated into NLP models to enhance processing capabilities.
+Please consider this document as a comprehensive guide for developing a semantic
+vocabulary that enhances the processing capabilities of NLP models.
