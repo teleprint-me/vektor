@@ -3,8 +3,11 @@ tests/base/test_activation.py
 
 Remember to adjust actual activation functions for more complex ones and to test various edge cases as needed.
 """
+import sys
+
 import numpy as np
 import pytest
+from scipy.sparse import csr_array, sparray
 
 from vektor.base.activation import Activation
 
@@ -15,7 +18,8 @@ def linear_activation(x: np.ndarray) -> np.ndarray:
 
 
 def linear_activation_prime(x: np.ndarray) -> np.ndarray:
-    return np.ones_like(x)
+    # NOTE: Explicitly set `dtype` to `float` to guarantee sparse arrays. Otherwise, it returns None instead.
+    return np.ones_like(x, dtype=float)
 
 
 @pytest.fixture
@@ -25,20 +29,28 @@ def activation_layer():
     )
 
 
-@pytest.fixture
-def input_data():
-    return np.array([[1.0, -2.0, 3.0], [-1.0, 2.0, -3.0]], dtype=float)
+@pytest.fixture(params=[np.array, csr_array])
+def input_data(request):
+    data = np.array([[1.0, -2.0, 3.0], [-1.0, 2.0, -3.0]], dtype=float)
+    return request.param(data)
 
 
-@pytest.fixture
-def output_gradient():
-    return np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]], dtype=float)
+@pytest.fixture(params=[np.array, csr_array])
+def output_gradient(request):
+    data = np.array([[0.1, 0.2, 0.3], [0.4, 0.5, 0.6]], dtype=float)
+    return request.param(data)
 
 
 def test_activation_forward(activation_layer, input_data):
     output = activation_layer.forward(input_data)
+    # Convert sparse matrices to dense for comparison
+    if isinstance(output, sparray):
+        output = output.toarray()
+        input_data = input_data.toarray()
     np.testing.assert_array_equal(
-        output, input_data, "Forward pass should apply the linear activation function"
+        output,
+        input_data,
+        "Forward pass should apply the linear activation function",
     )
 
 
@@ -47,6 +59,10 @@ def test_activation_backward(activation_layer, input_data, output_gradient):
     activation_layer.forward(input_data)
     # Calculate the backward pass which should apply the derivative of the activation function
     backward_output = activation_layer.backward(output_gradient)
+    # Convert sparse matrices to dense for comparison
+    if isinstance(backward_output, sparray):
+        backward_output = backward_output.toarray()
+        output_gradient = output_gradient.toarray()
     # For a linear activation, the backward output should be the same as the gradient
     np.testing.assert_array_equal(
         backward_output,
