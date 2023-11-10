@@ -3,7 +3,7 @@ tests/test_tokenizer.py
 """
 import pytest
 
-from vektor.tokenizer import Tokenizer
+from vektor.encoders.tokenizer import Tokenizer
 
 
 def test_tokenize():

@@ -3,8 +3,8 @@ tests/test_sparse_encoder.py
 """
 import pytest
 
-from vektor.sparse_encoder import SparseEncoder
-from vektor.tokenizer import Tokenizer
+from vektor.encoders.sparse import SparseEncoder
+from vektor.encoders.tokenizer import Tokenizer
 
 
 @pytest.fixture

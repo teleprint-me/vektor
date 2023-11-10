@@ -5,7 +5,7 @@ tests/test_skip_gram_model.py
 import pytest
 
 # Assuming your skip-gram model is in a module named model
-from vektor.model import SkipGramModel
+from vektor.models.skip_gram import SkipGramModel
 
 
 @pytest.fixture
