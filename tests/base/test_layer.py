@@ -18,6 +18,11 @@ class StubLayer(Layer[TArray]):
         return output_gradient
 
 
+@pytest.fixture
+def stub_layer():
+    return StubLayer()
+
+
 @pytest.fixture(params=[np.array, csr_array])
 def layer_input(request):
     data = np.array([[1, 2, 3], [4, 5, 6]], dtype=float)
@@ -30,18 +35,16 @@ def layer_gradient(request):
     return request.param(data)
 
 
-def test_layer_forward(layer_input):
-    layer = StubLayer()
-    output = layer.forward(layer_input)
+def test_layer_forward(stub_layer, layer_input):
+    output = stub_layer.forward(layer_input)
     if isinstance(output, np.ndarray):
         np.testing.assert_array_equal(output, layer_input)
     else:  # it's a sparse matrix
         np.testing.assert_array_equal(output.toarray(), layer_input.toarray())
 
 
-def test_layer_backward(layer_input, layer_gradient):
-    layer = StubLayer()
-    output = layer.backward(layer_gradient)
+def test_layer_backward(stub_layer, layer_input, layer_gradient):
+    output = stub_layer.backward(layer_gradient)
     if isinstance(output, np.ndarray):
         np.testing.assert_array_equal(output, layer_gradient)
     else:  # it's a sparse matrix
