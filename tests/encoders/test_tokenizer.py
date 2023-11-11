@@ -9,9 +9,12 @@ from vektor.encoders.tokenizer import Tokenizer
 def test_tokenize():
     # Test the tokenize function with different character sets
     texts = [
-        ("Hello, world! 123", ['Hello', ',', 'world', '!', '123']),
-        ("こんにちは！これはテストです。", ['こんにちは', '！', 'これはテストです', '。']),
-        ("😊👍", ['😊', '👍'])
+        ("Hello, world! 123", ["Hello", ",", "world", "!", "123"]),
+        (
+            "こんにちは！これはテストです。",
+            ["こんにちは", "！", "これはテストです", "。"],
+        ),
+        ("😊👍", ["😊", "👍"]),
     ]
     for text, expected_tokens in texts:
         assert Tokenizer.tokenize(text) == expected_tokens
