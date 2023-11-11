@@ -3,8 +3,6 @@ tests/base/test_activation.py
 
 Remember to adjust actual activation functions for more complex ones and to test various edge cases as needed.
 """
-import sys
-
 import numpy as np
 import pytest
 from scipy.sparse import csr_array, sparray
