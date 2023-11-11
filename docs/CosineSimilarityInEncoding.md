@@ -1,31 +1,38 @@
-Exploration of Cosine Similarity with Encoded Token Vectors
+# Exploration of Cosine Similarity with Encoded Token Vectors
 
-Cosine similarity is a staple in natural language processing for measuring the
-semantic similarity between two vectors. It's particularly effective with dense
-embeddings from models trained to capture contextual information. The use of
-cosine similarity with encodings, as opposed to embeddings, presents an
-unconventional approach, yet it may yield insightful results.
+Cosine similarity is a key metric in NLP for measuring semantic similarity
+between vectors. Its application with dense embeddings from context-aware models
+is well-known. However, using cosine similarity with encodings, rather than
+embeddings, offers an innovative approach that could yield valuable insights.
 
-Steps to Utilize Cosine Similarity with Encoded Vectors:
+## Steps to Utilize Cosine Similarity with Encoded Vectors
 
-1. Vector Representation: Sparse vectors can be obtained by mapping encoded
-   tokens onto a high-dimensional vector space.
-2. Normalization: Normalize vectors to enable the effective use of cosine
-   similarity, making sure the vector lengths do not affect the similarity
-   measure.
-3. Distance Measure: Apply cosine similarity to measure the distance between
-   normalized vectors, interpreting this as an indication of semantic
-   similarity.
-4. Contextual Information: Consider incorporating context into vector
-   representations to capture more nuanced semantic meanings.
-5. Dimensionality Reduction: Explore techniques like t-SNE or PCA for reducing
-   dimensionality in high-dimensional spaces, which might make the vectors more
-   manageable and reveal semantic structures.
-6. Evaluation: Conduct qualitative and quantitative analyses to evaluate the
-   correlation between the cosine similarity of encoded vectors and true
-   semantic similarity.
+1. **Vector Representation**: Obtain sparse vectors by mapping encoded tokens to
+   a high-dimensional space. Consider the influence of context in these
+   representations for richer semantic understanding.
 
-This document serves as a reminder of the thought process and rationale behind
-considering cosine similarity for use with sparse encoded token vectors. The key
-to success lies in the meaningful representation of semantic information within
-the structure of the vector space.
+2. **Normalization Process**: Normalize vectors to unit length to ensure the
+   similarity measure is not affected by vector magnitude. This step is crucial
+   for a fair comparison of cosine similarity.
+
+3. **Distance Measure**: Apply cosine similarity between normalized vectors as a
+   measure of semantic closeness. This can be indicative of underlying semantic
+   relationships.
+
+4. **Contextual Information Integration**: Discuss how context can be embedded
+   into vector representations, such as using sequence models or attention
+   mechanisms.
+
+5. **Dimensionality Reduction Techniques**: Explore methods like t-SNE or PCA
+   for making high-dimensional vectors more manageable, potentially uncovering
+   semantic patterns.
+
+6. **Evaluation**: Employ both qualitative and quantitative methods to evaluate
+   the approach. Discuss potential metrics and analysis techniques to assess the
+   correlation between cosine similarity scores and actual semantic similarity.
+
+---
+
+This document explores the unconventional yet promising use of cosine similarity
+with sparse encoded vectors, emphasizing the importance of meaningful semantic
+representation.
