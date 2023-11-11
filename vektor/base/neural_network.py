@@ -3,7 +3,7 @@ vektor/base/neural_network.py
 
 This module defines the base class for all neural network layers.
 """
-from typing import List, Tuple, Type, Union
+from typing import List, Tuple, Union
 
 import numpy as np
 from scipy.sparse import sparray
@@ -20,10 +20,8 @@ class NeuralNetwork:
         dtype (np.dtype): The data type for network parameters, default to float16.
     """
 
-    def __init__(self, layers: List[Type[Layer]], dtype: np.dtype = np.float16):
-        self.layers = [
-            layer() for layer in layers
-        ]  # Instantiate layers from the provided layer classes
+    def __init__(self, layers: List[Layer] = None, dtype: np.dtype = np.float16):
+        self.layers = layers if layers is not None else []
         self.dtype = dtype
 
     def forward(
@@ -46,11 +44,11 @@ class NeuralNetwork:
             gradient = layer.backward(gradient)
         return gradient
 
-    def add_layer(self, layer: Type[Layer]) -> None:
+    def add_layer(self, layer: Layer) -> None:
         """
         Add a new layer to the network.
         """
-        self.layers.append(layer())
+        self.layers.append(layer)
 
     def get_params(self) -> List[Tuple[Union[np.ndarray, sparray], np.ndarray]]:
         """
