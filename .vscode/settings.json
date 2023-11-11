@@ -19,6 +19,10 @@
   "[javascript]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
+  "notebook.formatOnSave.enabled": true,
+  "notebook.codeActionsOnSave": {
+    "source.organizeImports": true
+  },
   "python.analysis.extraPaths": [
     "${workspaceFolder}/.venv/bin",
     "${workspaceFolder}/.venv/lib/python3.11/site-packages",
@@ -28,7 +32,7 @@
   "python.languageServer": "Jedi",
   "python.analysis.typeCheckingMode": "strict",
   "[python]": {
-    "editor.defaultFormatter": "ms-python.black-formatter",
+    "editor.defaultFormatter": "charliermarsh.ruff",
     "editor.formatOnSave": true,
     "editor.formatOnPaste": false,
     "editor.codeActionsOnSave": {
