@@ -1,65 +1,66 @@
 # Vektor
 
-Vektor is an exploratory natural language processing (NLP) toolkit focused on
-delving into the mechanics of text processing and understanding through the lens
-of machine learning, particularly the Transformer architecture.
+## Project Overview
 
-## Overview
+Vektor is a personal project that serves as my playground for delving into the
+intricacies of Natural Language Processing (NLP) and Transformer models. As a
+self-initiated educational endeavor, it's primarily focused on deepening my
+understanding of these complex topics from the ground up.
 
-This project is both an educational journey and a testbed for experimental ideas
-in NLP. It encapsulates a range of functionalities from tokenization to
-encoding, with a keen interest in semantic analysis through encoded token
-vectors.
+## Current Focus
 
-## Features
+The project initially began as an exploration into encoding, decoding, and
+tokenization. However, it has since evolved into a more comprehensive study,
+particularly focusing on implementing the skip gram model and understanding
+Transformer architecture. This evolution stems from my realization that
+mastering these concepts in Python, a language I'm more comfortable with, is
+more feasible than tackling them in C/C++ as initially attempted.
 
-- `tokenizer.py`: A module for converting text into tokens, considering subwords
-  and various character sets including non-ASCII characters.
-- `sparse_encoder.py`: Implements sparse encoding of tokens, a stepping stone to
-  understanding text representation.
-- `html_to_text.py`: Converts HTML content into Markdown format, useful for
-  preprocessing steps in NLP workflows.
-- `model.py`: (In progress) Aims to implement a SkipGram model for generating
-  word embeddings.
-- Cosine Similarity Exploration: Documents and plans for applying cosine
-  similarity to token vectors, potentially revealing new insights into semantic
-  relationships.
+## Personal Learning Journey
 
-## Testing
+Vektor is not just about the final output but more about the journey and the
+learning process. The project is a testament to the iterative nature of
+learning, especially in the complex domain of NLP and machine learning. It's a
+reflection of my hands-on approach to understanding and building these systems
+from scratch, using only essential libraries and tools to reinforce fundamental
+learning.
 
-A suite of tests ensures the reliability of functionalities provided by
-`vektor`. These tests can be run with the following command:
+## Status and Goals
 
-```sh
-pytest tests/
-```
+As of now, Vektor remains a work-in-progress, a testament to the ongoing journey
+of learning and discovery in the field of NLP and AI. The main goals include:
+
+- Gaining a deeper understanding of Transformer models and their related
+  components.
+- Experimenting with different aspects of NLP, including tokenization and
+  encoding, memory, cognitive architecture, and more.
+- Keeping the project open for new directions and learnings as they arise.
 
 ## Documentation
 
-Each module and idea within `vektor` is accompanied by markdown documents,
-providing insights and rationale behind the implementations.
+For a deeper dive into the Vektor project, the documentation provides
+comprehensive insights and details:
 
-## Setup
+- **Project Overview**: For a detailed look at the overall design, architecture,
+  and goals of the Vektor project, see
+  [Project Overview](docs/VektorProjectOverview.md).
 
-To install `vektor`, clone the repository and install the dependencies listed in `requirements.txt` using pip:
+- **Technical Documentation**: Explore various technical aspects, including
+  tokenization, encoding, and model implementation, in the dedicated
+  [technical documents](docs/). This includes:
 
-```sh
-git clone https://github.com/teleprint-me/vektor
-cd vektor
-pip install -r requirements.txt
-```
+  - [Tokenization and Encoding](docs/tokenization/)
+  - [Model Architecture](docs/model/)
 
-## Contribution
+- **Upcoming Documentation**: I'm continually working on expanding the
+  documentation to cover more aspects of the project. Keep an eye on the `docs/`
+  directory for the latest updates.
 
-While `vektor` is a personal project, contributions or ideas that can foster the
-learning experience are welcome. Feel free to fork the project or submit issues
-and ideas.
+The documentation is a living entity and is regularly updated to reflect the
+latest progress and insights into the Vektor project.
 
-## License
+## Contributions and Collaborations
 
-Vektor is MIT licensed, as found in the LICENSE file.
-
----
-
-`vektor` is an ever-evolving project, reflective of the learning curve
-associated with the complex field of NLP and machine learning.
+While Vektor is a personal project, input, suggestions, and discussions are
+always welcome. They can provide fresh perspectives and insights, which are
+invaluable in a learning journey like this.
