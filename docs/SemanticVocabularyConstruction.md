@@ -1,103 +1,127 @@
-# Semantic Vocabulary Construction
+# Semantic Vocabulary Construction with Sparse Encoding
 
-This document serves as a guide for developing a semantic vocabulary that
-integrates words, characters, and subwords, balancing semantic richness with
-computational efficiency. It outlines a methodical process for creating
-numerical representations of text data, suitable for various NLP applications.
+This document outlines the process of developing a semantic vocabulary that
+integrates the tokenization and sparse encoding techniques as implemented in the
+Vektor project. The approach emphasizes language agnosticism and efficient
+semantic representation.
 
 ## Process Overview
 
 ### 1. Tokenization
 
-**Objective**: Split text into meaningful tokens, which can be full words,
-subwords, or characters.
+**Objective**: Break down text into manageable tokens for processing in NLP
+tasks.
 
-**Method**:
+**Implementation**: The `Tokenizer` class in `tokenizer.py` effectively
+tokenizes text into distinct tokens, including support for non-Latin characters.
 
-- Start by dividing text based on whitespace and punctuation.
-- Further subdivide for special cases, like compound words or contractions.
+**Code Example**:
 
-### 2. Unique Identifier Assignment
+```python
+from vektor.encoders.tokenizer import Tokenizer
 
-**Objective**: Assign a unique numerical identifier to each token.
+text = "こんにちは！ これは単なるテストです。"
+tokens = Tokenizer.tokenize(text)
+print(tokens)  # ['こんにちは', '！', 'これは単なるテストです', '。']
+```
 
-**Method**:
+_This snippet demonstrates tokenizing a string of Japanese text into individual
+tokens._
 
-- Use an incrementing index or a hash function for unique identification.
+#### 2. Deterministic Encoding
 
-### 3. Vector Representation
+**Objective**: Convert text tokens into numerical values using a deterministic
+function for further processing.
 
-**Objective**: Represent tokens as vectors.
+**Implementation**: The `Tokenizer` class in `tokenizer.py` is used to encode
+text tokens into unique numerical representations.
 
-**Method**:
+**Code Example**:
 
-- For words and subwords: Use a sparse vector representation with one-hot
+```python
+from vektor.encoders.tokenizer import Tokenizer
+
+text = "Sample text for encoding."
+tokens = Tokenizer.tokenize(text)
+encoded_tokens = [Tokenizer.encode_to_bytes(token) for token in tokens]
+print("Encoded Tokens:", encoded_tokens)
+```
+
+_This snippet demonstrates encoding a list of tokens into numerical values._
+
+#### 3. Sparse Vector Representation
+
+**Objective**: Convert encoded tokens into a compact, sparse format suitable for
+NLP processing.
+
+**Implementation**: The `SparseEncoder` class in `sparse.py` quantizes encoded
+tokens, assigning each a unique index in a high-dimensional space.
+
+**Code Example**:
+
+```python
+from vektor.encoders.tokenizer import Tokenizer
+from vektor.encoders.sparse import SparseEncoder
+
+text = "Example text for encoding."
+tokenizer = Tokenizer()
+tokens = tokenizer.tokenize(text)
+encoded_tokens = [tokenizer.encode_to_bytes(token) for token in tokens]
+
+sparse_encoder = SparseEncoder(num_bits=16)
+sparse_encoded_tokens = sparse_encoder.fit_transform(encoded_tokens)
+print("Sparse Encoded Tokens:", sparse_encoded_tokens)
+```
+
+_This snippet demonstrates converting a list of tokens into sparse encoded
+vectors._
+
+### 4. Normalization and Semantic Clustering
+
+- **Process**: Normalize these sparse vectors and use methods like cosine
+  similarity to cluster tokens based on semantic similarity.
+- **Potential**: This step will be crucial in grouping semantically similar
+  words and can leverage the efficient representations created by sparse
   encoding.
-- For characters: Employ ASCII or Unicode code points.
 
-### 4. Dimensionality Reduction
+### 5. Decoding and Lookup
 
-**Objective**: Reduce the high-dimensional vectors to more manageable sizes.
+- **Objective**: Translate sparse vectors back into textual tokens.
+- **Consideration**: Implementing an effective decoding mechanism that
+  accurately maps sparse vectors back to the original tokens.
 
-**Method**:
+### 6. Challenges and Considerations
 
-- Apply techniques like Principal Component Analysis (PCA) for linear
-  dimensionality reduction or Autoencoders for a non-linear approach.
+- **Encoding Function**: Developing an encoding function that accurately
+  captures semantic meaning.
+- **Semantic Preservation**: Maintaining semantic integrity during normalization
+  and dimensionality reduction.
+- **Model Integration**: Ensuring the vector space can be effectively integrated
+  into various NLP model architectures.
 
-### 5. Encoding Function
+### 7. Potential Advantages
 
-**Objective**: Develop a deterministic function mapping tokens to dense vectors.
+- **Simplification**: This method could simplify certain aspects of NLP models
+  by providing efficient token handling.
+- **Nuanced Understanding**: Facilitates a more nuanced understanding of word
+  relationships and contextual meanings.
 
-**Method**:
+#### Integration with Skip-Gram Model
 
-- Ensure the function adheres to the tokenization rules and chosen
-  dimensionality reduction method.
-
-### 6. Clustering for Semantic Similarity (Optional)
-
-**Objective**: Group semantically similar tokens to aid in vocabulary size
-reduction.
-
-**Method**:
-
-- Perform clustering on the dense vectors using algorithms like k-means or
-  hierarchical clustering.
-
-### 7. Vocabulary Construction
-
-**Objective**: Combine dense vectors to form the final vocabulary.
-
-**Method**:
-
-- Integrate vectors ensuring coverage of all token types and maintaining
-  semantic integrity.
-
-### 8. Consistency and Reliability
-
-**Objective**: Ensure the encoding function's consistency and vectors'
-reliability.
-
-**Method**:
-
-- Regularly test and validate the representation accuracy of tokens' semantic
-  meaning.
-
-## Use Cases
-
-This semantic vocabulary can be integrated into NLP models for tasks such as:
-
-- Text classification
-- Sentiment analysis
-- Machine translation
+The semantic vocabulary constructed through this process is designed to
+seamlessly integrate with models like the Skip-Gram model, particularly when
+dealing with large vocabularies. As outlined in the `SkipGramModelGuide.md`, the
+use of techniques such as Noise Contrastive Estimation (NCE) and Negative
+Sampling becomes essential in such scenarios. These techniques complement our
+tokenization and encoding methods by efficiently handling the outputs, making
+the entire process more computationally feasible for large-scale NLP tasks.
 
 ## Conclusion
 
-By blending character-level precision with word-level context, this approach
-offers a robust solution for constructing semantic vocabularies in NLP. The
-process is designed to be adaptable, catering to a wide range of applications in
-the field.
-
----
-
-Please consider this document as a comprehensive guide for developing a semantic
-vocabulary that enhances the processing capabilities of NLP models.
+This document offers a high-level overview of an innovative approach to
+tokenization and vocabulary generation in the Vektor project. By combining
+theoretical foundations with practical code implementations, it may potentially
+enhance the efficiency and semantic understanding capabilities of NLP models.
+Future developments will focus on refining the integration of this semantic
+vocabulary with advanced NLP models and exploring new applications in diverse
+linguistic contexts.
