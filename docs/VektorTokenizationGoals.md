@@ -1,66 +1,43 @@
-Project: Vektor Tokenization System
+# Vektor Tokenization System Goals
 
-Main Goals Document
+## Main Goals Document
 
-1. Language Agnosticism:
+1. **Language Agnosticism**: Develop a tokenization system versatile enough to
+   handle various languages and scripts, focusing on adaptability to different
+   linguistic phenomena.
 
-   - Develop a tokenization system that is not tied to any specific language or
-     script.
-   - Ensure the method can handle diverse linguistic phenomena and scripts.
+2. **Semantic Preservation**: Prioritize maintaining the semantic integrity of
+   the text in the tokenization process, exploring methods that integrate
+   semantic understanding directly into tokenization.
 
-2. Semantic Preservation:
+3. **Efficiency**: Aim for a computationally efficient tokenization method
+   suitable for large datasets, including the implementation of effective
+   compression schemes for token representation.
 
-   - Ensure that the tokenization process maintains the semantic meaning of the
-     text as much as possible.
-   - Explore the integration of semantic understanding into the tokenization
-     process.
+4. **Innovation**: Experiment with innovative tokenization approaches, moving
+   beyond established methods like WordPiece or BPE, to foster creative and
+   potentially groundbreaking solutions in NLP.
 
-3. Efficiency:
+5. **Machine Learning Compatibility**: Ensure the tokenized output is optimized
+   for machine learning models, particularly in NLP tasks, evaluating
+   tokenization quality based on its impact on model performance.
 
-   - Create a tokenization method that is computationally efficient and can be
-     scaled for large datasets.
-   - Implement effective compression schemes for the numerical representations
-     of tokens.
+6. **Benchmarking and Evaluation**: Establish benchmarks and a systematic
+   evaluation process for the tokenization system, comparing it against current
+   methodologies to assess effectiveness.
 
-4. Innovation:
+7. **Community Engagement and Feedback**: Actively engage with the NLP and
+   open-source communities through platforms such as GitHub, forums, and
+   conferences to gather and incorporate feedback.
 
-   - Experiment with novel approaches to tokenization that diverge from
-     established methods like WordPiece or BPE.
-   - Encourage creative solutions to tokenization that may not follow
-     traditional NLP paradigms.
+8. **Research and Development**: Stay abreast of the latest NLP research and
+   advancements, applying insights from academic literature to enhance the
+   tokenization system's development.
 
-5. Machine Learning Compatibility:
+9. **Iterative Improvement**: Adopt an iterative development approach, using
+   each iteration as a learning and improvement opportunity toward achieving the
+   final goal.
 
-   - Ensure that the tokenized output is suitable for use with machine learning
-     models, particularly in NLP tasks.
-   - Evaluate the quality of tokenization based on its impact on the performance
-     of machine learning models.
-
-6. Benchmarking and Evaluation:
-
-   - Establish benchmarks for the tokenization system against current methods.
-   - Set up a systematic evaluation process to assess the effectiveness of the
-     tokenization.
-
-7. Community Engagement and Feedback:
-
-   - Share progress and seek feedback from the NLP and open-source communities.
-   - Incorporate community input to refine and improve the tokenization method.
-
-8. Research and Development:
-
-   - Stay updated with the latest research in NLP and tokenization.
-   - Use insights from academic literature to inform the development of the
-     tokenization system.
-
-9. Iterative Improvement:
-
-   - Adopt an iterative approach to developing the tokenization system.
-   - Use each iteration as a learning opportunity and a step towards the final
-     goal.
-
-10. Documentation:
-    - Maintain comprehensive documentation of the project's progress,
-      methodologies, and findings.
-    - Ensure that the documentation is clear and detailed to assist future work
-      on the project.
+10. **Documentation**: Maintain clear and comprehensive documentation of the
+    project's progress and methodologies, facilitating future work and
+    replication of the project.
