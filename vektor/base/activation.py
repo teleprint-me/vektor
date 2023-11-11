@@ -67,7 +67,6 @@ class Activation(Layer[TArray]):
             return output_gradient.multiply(self.activation_prime(self.input))
         elif isinstance(output_gradient, ndarray):
             # Use numpy's multiply for dense arrays
-            print(output_gradient, self.input)
             return multiply(output_gradient, self.activation_prime(self.input))
         else:
             raise ValueError(
