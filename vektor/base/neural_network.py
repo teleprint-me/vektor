@@ -14,16 +14,39 @@ class NeuralNetwork(Protocol):
     """
 
     def __init__(self, architecture: Optional[List[Mapping[str, Any]]] = None):
-        self.layers: List[Layer[TArray]] = []
-        if architecture:
+        self._layers: List[Layer[TArray]] = []
+        self._architecture = architecture if architecture else []
+        if self._architecture:
             self.build_network(architecture)
+
+    def __getitem__(self, index: int) -> Layer:
+        return self._layers[index]
+
+    def __setitem__(self, index: int, layer: Layer) -> None:
+        if index >= len(self._layers):
+            self._layers.append(layer)
+        else:
+            self._layers[index] = layer
+
+    def __len__(self) -> int:
+        return len(self._layers)
+
+    def __contains__(self, layer: Layer) -> bool:
+        return layer in self._layers
+
+    @property
+    def layers(self) -> List[Layer[TArray]]:
+        """
+        Returns a list of layers composed of the implementation of the neural network.
+        """
+        return self._layers
 
     @property
     def architecture(self) -> List[Mapping[str, Any]]:
         """
         Returns the architectural details of the model in a predefined format.
         """
-        ...
+        return self._architecture
 
     def build_network(self, architecture: List[Mapping[str, Any]]) -> None:
         """
@@ -32,39 +55,15 @@ class NeuralNetwork(Protocol):
         Args:
             architecture (List[Mapping[str, Any]]): A list of layer specifications.
         """
-        for layer_spec in architecture:
-            self.add_layer(layer_spec)
+        for specification in architecture:
+            self.add_layer(specification)
 
-    def add_layer(self, layer_spec: Mapping[str, Any]) -> None:
+    def add_layer(self, specification: Mapping[str, Any]) -> None:
         """
         Adds a layer based on the given specification.
         """
         # Implementation of layer creation.
         # Use a factory function or direct instantiation.
-        ...
-
-    def get_layer(self, identifier: Any) -> Layer:
-        """
-        Retrieve a layer by its identifier.
-
-        Args:
-            identifier (Any): The identifier of the layer to retrieve.
-
-        Returns:
-            Layer: The requested layer.
-        """
-        # Implementation to retrieve a layer based on its identifier
-        ...
-
-    def set_layer(self, identifier: Any, layer: Layer) -> None:
-        """
-        Replace or set a layer in the network by its identifier.
-
-        Args:
-            identifier (Any): The identifier of the layer to replace or set.
-            layer (Layer): The new layer to set.
-        """
-        # Implementation to set or replace a layer based on its identifier
         ...
 
     def forward(self, input_data: TArray) -> TArray:
