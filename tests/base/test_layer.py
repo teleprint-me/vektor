@@ -8,7 +8,7 @@ from scipy.sparse import csr_array
 from vektor.base.layer import Layer, TArray
 
 
-class StubLayer(Layer[TArray]):
+class MockLayer(Layer[TArray]):
     def forward(self, input_data: TArray) -> TArray:
         # A simple pass-through for testing purposes
         return input_data
@@ -19,8 +19,8 @@ class StubLayer(Layer[TArray]):
 
 
 @pytest.fixture
-def stub_layer():
-    return StubLayer()
+def mock_layer():
+    return MockLayer()
 
 
 @pytest.fixture(params=[np.array, csr_array])
@@ -35,16 +35,16 @@ def layer_gradient(request):
     return request.param(data)
 
 
-def test_layer_forward(stub_layer, layer_input):
-    output = stub_layer.forward(layer_input)
+def test_layer_forward(mock_layer, layer_input):
+    output = mock_layer.forward(layer_input)
     if isinstance(output, np.ndarray):
         np.testing.assert_array_equal(output, layer_input)
     else:  # it's a sparse matrix
         np.testing.assert_array_equal(output.toarray(), layer_input.toarray())
 
 
-def test_layer_backward(stub_layer, layer_input, layer_gradient):
-    output = stub_layer.backward(layer_gradient)
+def test_layer_backward(mock_layer, layer_input, layer_gradient):
+    output = mock_layer.backward(layer_gradient)
     if isinstance(output, np.ndarray):
         np.testing.assert_array_equal(output, layer_gradient)
     else:  # it's a sparse matrix
