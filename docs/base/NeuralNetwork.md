@@ -169,14 +169,6 @@ loaded_network.load("my_network.h5")
   scenarios, ensuring the class behaved as expected and gracefully handled
   errors.
 
-### Collaboration and Community Feedback
-
-- Collaboration played a crucial role in the development process. Regular
-  discussions and code reviews helped refine ideas and improve the overall
-  design.
-- Feedback from early users was invaluable, providing real-world insights into
-  how the class was used and where improvements could be made.
-
 ### Future Development Considerations
 
 - While the current implementation meets initial goals, it's open to future
