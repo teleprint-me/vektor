@@ -3,30 +3,71 @@ vektor/base/neural_network.py
 
 This module defines the base class for all neural network layers.
 """
-from typing import List, Tuple, Union
+from typing import Any, List, Mapping, Optional, Protocol
 
-import numpy as np
-from scipy.sparse import sparray
-
-from vektor.base.layer import Layer
+from vektor.base.layer import Layer, TArray
 
 
-class NeuralNetwork:
+class NeuralNetwork(Protocol):
     """
     Base class for a modular neural network, with support for various layer types.
-
-    Attributes:
-        layers (List[Layer]): A list of layers that make up the network.
-        dtype (np.dtype): The data type for network parameters, default to float16.
     """
 
-    def __init__(self, layers: List[Layer] = None, dtype: np.dtype = np.float16):
-        self.layers = layers if layers is not None else []
-        self.dtype = dtype
+    def __init__(self, architecture: Optional[List[Mapping[str, Any]]] = None):
+        self.layers: List[Layer[TArray]] = []
+        if architecture:
+            self.build_network(architecture)
 
-    def forward(
-        self, input_data: Union[np.ndarray, sparray]
-    ) -> Union[np.ndarray, sparray]:
+    @property
+    def architecture(self) -> List[Mapping[str, Any]]:
+        """
+        Returns the architectural details of the model in a predefined format.
+        """
+        ...
+
+    def build_network(self, architecture: List[Mapping[str, Any]]) -> None:
+        """
+        Builds the network based on the provided architecture.
+
+        Args:
+            architecture (List[Mapping[str, Any]]): A list of layer specifications.
+        """
+        for layer_spec in architecture:
+            self.add_layer(layer_spec)
+
+    def add_layer(self, layer_spec: Mapping[str, Any]) -> None:
+        """
+        Adds a layer based on the given specification.
+        """
+        # Implementation of layer creation.
+        # Use a factory function or direct instantiation.
+        ...
+
+    def get_layer(self, identifier: Any) -> Layer:
+        """
+        Retrieve a layer by its identifier.
+
+        Args:
+            identifier (Any): The identifier of the layer to retrieve.
+
+        Returns:
+            Layer: The requested layer.
+        """
+        # Implementation to retrieve a layer based on its identifier
+        ...
+
+    def set_layer(self, identifier: Any, layer: Layer) -> None:
+        """
+        Replace or set a layer in the network by its identifier.
+
+        Args:
+            identifier (Any): The identifier of the layer to replace or set.
+            layer (Layer): The new layer to set.
+        """
+        # Implementation to set or replace a layer based on its identifier
+        ...
+
+    def forward(self, input_data: TArray) -> TArray:
         """
         Perform a forward pass through each layer in the network.
         """
@@ -34,9 +75,7 @@ class NeuralNetwork:
             input_data = layer.forward(input_data)
         return input_data
 
-    def backward(
-        self, gradient: Union[np.ndarray, sparray]
-    ) -> Union[np.ndarray, sparray]:
+    def backward(self, gradient: TArray) -> TArray:
         """
         Perform a backward pass through each layer in the network, in reverse order.
         """
@@ -44,26 +83,26 @@ class NeuralNetwork:
             gradient = layer.backward(gradient)
         return gradient
 
-    def add_layer(self, layer: Layer) -> None:
+    def train(self, x: TArray, y: TArray) -> None:
         """
-        Add a new layer to the network.
+        Train the model on a given dataset (x) using ground truth labels (y).
         """
-        self.layers.append(layer)
+        ...
 
-    def get_params(self) -> List[Tuple[Union[np.ndarray, sparray], np.ndarray]]:
+    def predict(self, x: TArray) -> TArray:
         """
-        Get parameters from all layers in the network.
+        Get a prediction (y) from a trained model.
         """
-        return [
-            layer.get_params() for layer in self.layers if hasattr(layer, "get_params")
-        ]
+        ...
 
-    def set_params(
-        self, params: List[Tuple[Union[np.ndarray, sparray], np.ndarray]]
-    ) -> None:
+    def save(self, file_name: str) -> None:
         """
-        Set parameters for all layers in the network.
+        Save the trained model to a HDF5 container.
         """
-        for layer, param in zip(self.layers, params):
-            if hasattr(layer, "set_params"):
-                layer.set_params(*param)
+        ...
+
+    def load(self, file_name: str) -> None:
+        """
+        Load the trained model from a HDF5 container.
+        """
+        ...
