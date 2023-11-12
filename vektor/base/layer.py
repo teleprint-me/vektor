@@ -25,6 +25,13 @@ class Layer(Protocol[TArray]):
     Protocol defining the mandatory methods that any neural network layer must implement.
     """
 
+    @property
+    def architecture(self) -> Mapping[str, Any]:
+        """
+        Returns the architectural details of the layer in a predefined format.
+        """
+        ...
+
     def forward(self, input_data: TArray) -> TArray:
         """
         Perform a forward pass through the layer.
@@ -56,8 +63,4 @@ class Layer(Protocol[TArray]):
 
     def set_params(self, **params: TArray) -> None:
         """Set the parameters of the layer."""
-        ...
-
-    def update_params(self, **grads: TArray) -> None:
-        """Update the parameters of the layer using the provided gradients."""
         ...
