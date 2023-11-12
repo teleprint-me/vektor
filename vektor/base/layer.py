@@ -26,9 +26,9 @@ class Layer(Protocol[TArray]):
     """
 
     @property
-    def architecture(self) -> Mapping[str, Any]:
+    def specification(self) -> Mapping[str, Any]:
         """
-        Returns the architectural details of the layer in a predefined format.
+        Returns the specification details of the layer in a predefined format.
         """
         ...
 
