@@ -44,7 +44,7 @@ class Layer(Protocol[TArray]):
         """
         ...
 
-    def backward(self, output_gradient: TArray, **kwargs: Mapping[str, Any]) -> TArray:
+    def backward(self, output_gradient: TArray, **kwargs: Any) -> TArray:
         """
         Perform a backward pass to compute the gradient.
 
@@ -57,10 +57,10 @@ class Layer(Protocol[TArray]):
         """
         ...
 
-    def get_params(self) -> Mapping[str, TArray]:
+    def get_params(self) -> Mapping[str, Any]:
         """Return the parameters of the layer."""
         ...
 
-    def set_params(self, **params: TArray) -> None:
+    def set_params(self, **params: Any) -> None:
         """Set the parameters of the layer."""
         ...
