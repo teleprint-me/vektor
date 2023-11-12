@@ -33,6 +33,15 @@ class Activation(Layer[TArray]):
         self.input: Optional[TArray] = None
         self.output: Optional[TArray] = None
 
+    @property
+    def architecture(self) -> Mapping[str, Any]:
+        """
+        Returns the architectural details of the layer in a predefined format.
+        """
+        raise NotImplementedError(
+            f"Activation architecture is missing for {self.__class__.__name__}."
+        )
+
     def forward(self, input_data: TArray) -> TArray:
         """
         Perform a forward pass through the activation layer.
