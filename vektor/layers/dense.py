@@ -61,7 +61,7 @@ class Dense(Layer[TArray]):
             scaling_factor = np.sqrt(2.0 / self.input_dim)
         elif self.activation_fn in ["tanh", "sigmoid"]:
             # NOTE: Glorot and Bengio initialization:
-            #   Var(W) = mu + ( 2 / (n_in + n_out))
+            #   Var(W) = mu + (2 / (n_in + n_out))
             # This initialization maintains the variance of activations
             # across layers. 6 or 2 may be used as the coefficient of the
             # expression. Averaging the dimensions and then dividing the
@@ -111,12 +111,6 @@ class Dense(Layer[TArray]):
     def forward(self, input_data: TArray) -> TArray:
         """
         Perform a forward pass through the layer.
-
-        Args:
-            input_data (TArray): The input data to the layer.
-
-        Returns:
-            TArray: Output data after applying the layer's transformation.
         """
         self.input = input_data
         self.output = np.dot(self.input, self.weights) + self.biases
@@ -127,14 +121,6 @@ class Dense(Layer[TArray]):
     ) -> TArray:
         """
         Perform a backward pass through the layer for gradient computation.
-
-        Args:
-            output_gradient (TArray): The gradient of the loss with respect to the layer's output.
-            learning_rate (float): The learning rate for gradient descent.
-            lambda_ (float): Regularization parameter.
-
-        Returns:
-            TArray: The gradient of the loss with respect to the layer's input data.
         """
         input_gradient = np.dot(output_gradient, self.weights.T)
         weights_gradient = np.dot(self.input.T, output_gradient)
@@ -153,9 +139,6 @@ class Dense(Layer[TArray]):
     def get_params(self) -> Dict[str, Union[TArray, np.floating]]:
         """
         Get the current weights and biases of the layer.
-
-        Returns:
-            tuple: A tuple containing the weights (TArray), biases (TArray), and data type (Defaults to np.float32).
         """
         return {
             "weights": self.weights,
@@ -168,11 +151,6 @@ class Dense(Layer[TArray]):
     ) -> None:
         """
         Set the weights and biases of the layer.
-
-        Args:
-            weights (TArray): The new weights for the layer.
-            biases (TArray): The new biases for the layer.
-            dtype (np.floating, optional): The data type used for internal computations. Defaults to np.float32.
         """
         self.weights = weights
         self.biases = biases
