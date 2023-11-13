@@ -44,8 +44,8 @@ class MockLayer(Layer[TArray]):
     @property
     def specification(self) -> dict:
         return {
-            "type": "MockDense",
-            "class": MockDense,  # Self-reference to the class
+            "type": "MockLayer",
+            "class": MockLayer,  # Self-reference to the class
             "input_dim": self.weights.shape[1],
             "output_dim": self.weights.shape[0],
             "dtype": self.dtype,
@@ -122,3 +122,38 @@ def test_layer_backward(mock_layer, layer_input, layer_gradient):
 
     # Check if the actual output matches the expected output
     np.testing.assert_array_almost_equal(output, expected_output)
+
+
+def test_layer_specification(mock_layer):
+    # Get the specification from the mock_layer
+    spec = mock_layer.specification
+
+    # Assertions to ensure the specification contains the right information
+    assert isinstance(spec, dict), "Specification should be a dictionary."
+    assert spec["type"] == "MockLayer", "Layer type should be 'MockLayer'."
+    assert spec["class"] == MockLayer, "Class reference should be MockLayer."
+    assert (
+        spec["input_dim"] == mock_layer.weights.shape[1]
+    ), "Input dimension should match weights shape."
+    assert (
+        spec["output_dim"] == mock_layer.weights.shape[0]
+    ), "Output dimension should match weights shape."
+    assert spec["dtype"] == mock_layer.dtype, "Data type should match layer's dtype."
+
+
+def test_layer_specification_for_new_instance(mock_layer):
+    # Get the specification from the mock_layer
+    spec = mock_layer.specification
+
+    # Create a new instance of MockLayer using the specification
+    new_layer = MockLayer(spec["input_dim"], spec["output_dim"])
+    new_layer.dtype = spec["dtype"]
+
+    # Assertions to check if the new layer matches the specification
+    assert (
+        new_layer.weights.shape[1] == spec["input_dim"]
+    ), "Input dimension should match the specification."
+    assert (
+        new_layer.weights.shape[0] == spec["output_dim"]
+    ), "Output dimension should match the specification."
+    assert new_layer.dtype == spec["dtype"], "Data type should match the specification."
