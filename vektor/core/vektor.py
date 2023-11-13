@@ -37,14 +37,48 @@ class Vektor:
         """
         return "\n".join(["\t".join(map(str, row)) for row in self.matrix])
 
-    def __matmul__(self, other) -> "Vektor":
-        result = [
-            [sum(a * b for a, b in zip(row, col)) for col in zip(*other.matrix)]
-            for row in self.matrix
-        ]
-        return Vektor(result)
+    def __elementwise__(
+        self, other: "Vektor", operation: Callable[[float, float], float]
+    ) -> "Vektor":
+        if self.shape != other.shape:
+            raise ValueError(
+                "Matrix shapes must be identical for elementwise operations"
+            )
 
-    def transpose(self) -> "Vektor":
+        return Vektor(
+            [
+                [
+                    operation(self.matrix[i][j], other.matrix[i][j])
+                    for j in range(len(self.matrix[0]))
+                ]
+                for i in range(len(self.matrix))
+            ],
+            dtype=self.dtype,
+        )
+
+    def __add__(self, other: "Vektor") -> "Vektor":
+        return self.__elementwise__(other, lambda x, y: x + y)
+
+    def __sub__(self, other: "Vektor") -> "Vektor":
+        return self.__elementwise__(other, lambda x, y: x - y)
+
+    def __mul__(self, other: "Vektor") -> "Vektor":
+        return self.__elementwise__(other, lambda x, y: x * y)
+
+    def __matmul__(self, other: "Vektor") -> "Vektor":
+        if len(self.matrix[0]) != len(other.matrix):
+            raise ValueError("Shapes are not aligned for matrix multiplication")
+
+        return Vektor(
+            [
+                [sum(a * b for a, b in zip(row, col)) for col in zip(*other.matrix)]
+                for row in self.matrix
+            ],
+            dtype=self.dtype,
+        )
+
+    @property
+    def T(self) -> "Vektor":
         """
         Transpose the matrix.
 
@@ -58,52 +92,7 @@ class Vektor:
             self.dtype,
         )
 
-    def dot(self, other: "Vektor") -> "Vektor":
-        """
-        Perform a dot product with another Vektor.
-
-        :param other: The Vektor to dot with.
-        :return: A new Vektor instance representing the result of the dot product.
-        """
-        if len(self.matrix[0]) != len(other.matrix):
-            raise ValueError("Shapes are not aligned for dot product")
-        return Vektor(
-            [
-                [sum(a * b for a, b in zip(row, col)) for col in zip(*other.matrix)]
-                for row in self.matrix
-            ],
-            self.dtype,
-        )
-
-    def elementwise(
-        self,
-        other: "Vektor",
-        operation: Callable[[float, float], float] = lambda x, y: x + y,
-    ) -> "Vektor":
-        """
-        Perform an elementwise operation with another Vektor.
-
-        :param other: The Vektor to operate with.
-        :param operation: A callable taking two arguments and returning the result of an elementwise operation.
-        :return: A new Vektor instance representing the result of the elementwise operation.
-        """
-        if len(self.matrix) != len(other.matrix) or len(self.matrix[0]) != len(
-            other.matrix[0]
-        ):
-            raise ValueError(
-                "Matrix shapes must be identical for elementwise operations"
-            )
-        return Vektor(
-            [
-                [
-                    operation(self.matrix[i][j], other.matrix[i][j])
-                    for j in range(len(self.matrix[0]))
-                ]
-                for i in range(len(self.matrix))
-            ],
-            self.dtype,
-        )
-
+    @property
     def shape(self) -> Tuple[int, int]:
         """
         Get the shape of the matrix.
@@ -115,7 +104,43 @@ class Vektor:
 
 # Example usage:
 if __name__ == "__main__":
-    nn_ops = Vektor(shape=(2, 3))
-    print("Matrix:\n", nn_ops)
-    print("Transpose:\n", nn_ops.transpose())
-    print("Transpose:\n", nn_ops.transpose())
+    import math
+
+    class Neuron:
+        def __init__(self, num_inputs: int):
+            """
+            Initialize the neuron with random weights and a bias.
+
+            :param num_inputs: Number of input connections to the neuron.
+            """
+            self.weights = Vektor(shape=(1, num_inputs))  # Random weights
+            self.bias = Vektor(matrix=[[random.gauss(0, 1)]])  # Random bias
+
+        def activate(
+            self, inputs: Vektor, activation_function: Callable[[float], float]
+        ) -> float:
+            """
+            Activate the neuron with the given inputs and activation function.
+
+            :param inputs: Input values as a Vektor.
+            :param activation_function: A function to apply to the weighted sum.
+            :return: The output of the neuron.
+            """
+            # This was self.weights @ inputs + self.bias
+            weighted_sum = inputs @ self.weights.T + self.bias
+            return activation_function(
+                weighted_sum.matrix[0][0]
+            )  # Applying the activation function
+
+    def sigmoid(x: float) -> float:
+        return 1 / (1 + math.exp(-x))
+
+    # Create a neuron with 3 inputs
+    neuron = Neuron(num_inputs=3)
+
+    # Example input
+    inputs = Vektor(matrix=[[0.5, -1, 0.2]])
+
+    # Activate the neuron
+    output = neuron.activate(inputs, sigmoid)
+    print("Neuron output:", output)
