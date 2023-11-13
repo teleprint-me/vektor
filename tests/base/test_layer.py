@@ -43,6 +43,9 @@ class MockLayer(Layer[TArray]):
 
     @property
     def specification(self) -> dict:
+        # NOTE: Referencing the class is experimental and may or may not be included in the proceeding revisions.
+        # Further testing involving class serialization is required to determine whether or not this is a feasible approach.
+        # The remaining key-value pairs should be sufficient regardless of the final implementation.
         return {
             "type": "MockLayer",
             "class": MockLayer,  # Self-reference to the class
@@ -157,3 +160,49 @@ def test_layer_specification_for_new_instance(mock_layer):
         new_layer.weights.shape[0] == spec["output_dim"]
     ), "Output dimension should match the specification."
     assert new_layer.dtype == spec["dtype"], "Data type should match the specification."
+
+
+def test_get_params(mock_layer):
+    # Get the parameters from the mock_layer
+    params = mock_layer.get_params()
+
+    # Assertions to check if the parameters match the layer's properties
+    np.testing.assert_array_equal(
+        params["weights"], mock_layer.weights, "Weights should match."
+    )
+    np.testing.assert_array_equal(
+        params["biases"], mock_layer.biases, "Biases should match."
+    )
+    assert params["dtype"] == mock_layer.dtype, "Data type should match."
+
+
+def test_set_params(mock_layer):
+    # Execute a sanity check for the default data type
+    assert issubclass(
+        mock_layer.dtype, float
+    ), "Expected default to be type class float."
+
+    # Create new parameters using a consistent random number generator
+    rng = np.random.default_rng()
+    new_dtype = np.float32  # Different data type for testing
+    new_weights = rng.standard_normal(size=mock_layer.weights.shape, dtype=new_dtype)
+    new_biases = rng.standard_normal(size=mock_layer.biases.shape, dtype=new_dtype)
+
+    # Set new parameters
+    mock_layer.set_params(new_weights, new_biases, new_dtype)
+
+    # Get the updated parameters
+    updated_params = mock_layer.get_params()
+
+    # Assertions to check if the layer's parameters have been updated
+    np.testing.assert_array_equal(
+        updated_params["weights"], new_weights, "Weights should be updated."
+    )
+    np.testing.assert_array_equal(
+        updated_params["biases"], new_biases, "Biases should be updated."
+    )
+    assert updated_params["dtype"] == new_dtype, "Data type should be updated."
+    np.testing.assert_array_equal(
+        updated_params["biases"], new_biases, "Biases should be updated."
+    )
+    assert updated_params["dtype"] == new_dtype, "Data type should be updated."
