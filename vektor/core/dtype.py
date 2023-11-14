@@ -1,42 +1,96 @@
 """
+NOTE: This is a WIP (Work in Progress).
+
 vektor/core/dtype.py
 
-              32-BIT FLOATING POINT FORMAT IEEE-754
+## 32-BIT FLOATING POINT FORMAT IEEE-754
 
 SIGN BIT          8-BIT EXPONENT              23-BIT MANTISSA
    1                 10000011           0111100 | 01100000 | 00000000
-1 = NEGATIVE      EXAMPLE: -23.546875
-0 = POSITIVE      HEX: 0xc1bc6000
 
-           value = (-1)^sign · 2^(exponent - bias) · mantissa
+EXAMPLE: -23.546875    HEX: 0xc1bc6000
 
-NOTE: This is a WIP (Work in Progress).
+value = (-1)^sign · 2^(exponent - bias) · mantissa
+
+### Understanding IEEE-754
+
+1. **Components**: A floating-point number in IEEE-754 format consists of three parts:
+    - **Sign bit**: Indicates positive or negative.
+    - **Exponent**: Determines the range of the number.
+    - **Mantissa (or significand)**: The precision part of the number.
+
+2. **Representation**: The standard representation for a floating-point number is:
+
+    (-1)^sign · 2^(exponent - bias) · mantissa
+
+    The exponent is 'biased' to handle both positive and negative exponents.
+
+3. **Special Values**: NaN, infinity, and zero are represented using specific patterns in the exponent and mantissa.
+
+### Conversion Between Python Int and Floating-Point values
+
+1. **From Float to Int (Custom Precision)**:
+   - **Extract Components**: Use `math.frexp()` to break the float into a mantissa and exponent. 
+   - **Normalize and Scale**: Adjust the mantissa and exponent according to your custom precision. This involves scaling and possibly rounding the mantissa, and adjusting the exponent with a custom bias.
+   - **Pack into Int**: Combine the sign, exponent, and mantissa into an integer using bitwise operations.
+
+2. **From Int to Float**:
+   - **Extract Components**: Use bitwise operations to extract the sign, exponent, and mantissa from the integer.
+   - **De-normalize**: Adjust the exponent and mantissa back to their original scale. This involves adding the bias back to the exponent and converting the mantissa back to a fraction.
+   - **Construct the Float**: Combine these components back into a floating-point number.
 """
 import math
 from abc import ABCMeta, abstractmethod
-from typing import Protocol
+from typing import List, Protocol, Tuple, Union
+
+TBool = bool
+TInt = int
+TFloat = float
+TScalar = Union[TBool, TInt, TFloat]
+TVector = List[TScalar]
+TMatrix = List[TVector]
+TShape = Tuple[int, int]
 
 
-class TFloat(Protocol, metaclass=ABCMeta):
-    def __init__(self, sign, exponent, mantissa, bias: int):
-        ...
+class DType(Protocol, metaclass=ABCMeta):
+    """
+    Abstract base class representing a data type, designed for converting between
+    floating point and integer representations with custom precision. This class
+    serves as a protocol for subclasses to implement specific conversion logic
+    for different data types.
+    """
 
     @abstractmethod
-    def __call__(self, value: float) -> "TFloat":
+    def __call__(self, value: float) -> int:
+        """
+        Convert a floating-point number to its corresponding integer representation
+        based on the custom precision defined by the subclass.
+
+        Parameters:
+        value (float): The floating-point number to be converted.
+
+        Returns:
+        int: The integer representation of the floating-point number.
+        """
         ...
 
     @staticmethod
     @abstractmethod
-    def to_float(value: "TFloat") -> float:
+    def to_float(value: int) -> float:
+        """
+        Convert an integer back to its floating-point representation based on the
+        custom precision defined by the subclass.
+
+        Parameters:
+        value (int): The integer value to be converted.
+
+        Returns:
+        float: The floating-point representation of the integer.
+        """
         ...
 
 
-class Float64(TFloat):
-    # TODO: Implement arithmetic operations with appropriate precision handling
-    ...
-
-
-class Float32(TFloat):
+class float32(DType):  # WIP
     # NOTE: Hexadecimal values are always type `int` in Python.
 
     def __call__(self, value: float) -> int:
@@ -70,18 +124,19 @@ class Float32(TFloat):
     @staticmethod
     def to_float(value: int) -> float:
         # Implement conversion from custom 32-bit to 64-bit float
+        ...  # TODO
+
+
+class float16(DType):  # TODO
+    def __call__(self, value: float) -> int:
+        ...
+
+    @staticmethod
+    def to_float(value: int) -> float:
         ...
 
 
-class Float16:
-    def __init__(self, value):
-        # Store the value with float16 precision
-        pass
-
-    # Implement methods for arithmetic operations, str, etc.
-
-
-class Float8:
+class float8(DType):  # WIP
     def __call__(self, value: float) -> int:
         """
         Convert a value from float64 to float8.
@@ -145,13 +200,10 @@ class Float8:
         return result
 
 
-class Float4:
-    def __init__(self, value):
-        # Store the value with float4 precision
-        pass
+class float4(DType):  # TODO
+    def __call__(self, value: float) -> int:
+        ...
 
-        # Implement methods for arithmetic operations, str, etc.
-        # Store the value with float4 precision
-        pass
-
-    # Implement methods for arithmetic operations, str, etc.
+    @staticmethod
+    def to_float(value: int) -> float:
+        ...
