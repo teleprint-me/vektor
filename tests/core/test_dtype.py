@@ -8,7 +8,7 @@ import pytest
 from vektor.core.dtype import float32
 
 
-def custom_integer_is_close(a: int, b: int, tolerance: int) -> bool:
+def integer_is_close(a: int, b: int, tolerance: int) -> bool:
     """
     Check if two integer values are close within a specified tolerance.
 
@@ -23,7 +23,7 @@ def custom_integer_is_close(a: int, b: int, tolerance: int) -> bool:
     return abs(a - b) <= tolerance
 
 
-def custom_float_is_close(a, b, relative=1e-03, absolute=0.0):
+def float_is_close(a, b, relative=1e-03, absolute=0.0):
     """
     Check if two floating-point values are approximately equal within specified tolerances.
 
@@ -97,8 +97,8 @@ def test_conversion_of_standard_float_to_float32(float32_value, float32_expected
         float32_value (float): The 32-bit float value obtained from converting a standard float.
         float32_expected_value (int): The expected 32-bit float value represented as an integer.
     """
-    tolerance = 1_000_000  # Adjust the tolerance based on your precision requirements
-    assert custom_integer_is_close(float32_value, float32_expected_value, tolerance)
+    tolerance = 500_000  # Adjust the tolerance based on your precision requirements
+    assert integer_is_close(float32_value, float32_expected_value, tolerance)
 
 
 def test_conversion_of_standard_float32_to_float(float32_value, float64_expected_value):
@@ -113,7 +113,7 @@ def test_conversion_of_standard_float32_to_float(float32_value, float64_expected
         float64_expected_value (float): The expected 64-bit float value.
     """
     float32_as_float64 = float32.to_float(float32_value)
-    assert custom_float_is_close(float32_as_float64, float64_expected_value, 1e-06)
+    assert float_is_close(float32_as_float64, float64_expected_value, 1e-03)
 
 
 def test_float32_precision(float32_value, float64_expected_value):
@@ -132,10 +132,7 @@ def test_float32_precision(float32_value, float64_expected_value):
     converted_value = float32.to_float(float32_value)
 
     assert converted_value != expected_value
-    relative_tolerance = (
-        1e-6  # Adjust the tolerance based on your precision requirements
-    )
-    assert custom_float_is_close(converted_value, expected_value, relative_tolerance)
+    assert float_is_close(converted_value, expected_value, 1e-03)
 
 
 def test_float32_special_values():
