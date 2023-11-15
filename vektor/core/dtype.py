@@ -61,7 +61,7 @@ class DType(Protocol, metaclass=ABCMeta):
     """
 
     @abstractmethod
-    def __call__(self, value: float) -> int:
+    def __call__(self, value: TFloat) -> TInt:
         """
         Convert a floating-point number to its corresponding integer representation
         based on the custom precision defined by the subclass.
@@ -76,7 +76,7 @@ class DType(Protocol, metaclass=ABCMeta):
 
     @staticmethod
     @abstractmethod
-    def to_float(value: int) -> float:
+    def to_float(value: TInt) -> TFloat:
         """
         Convert an integer back to its floating-point representation based on the
         custom precision defined by the subclass.
@@ -90,19 +90,32 @@ class DType(Protocol, metaclass=ABCMeta):
         ...
 
 
-class float32(DType):  # WIP
-    # NOTE: Hexadecimal values are always type `int` in Python.
+class Float32(DType):  # WIP
+    # Special Numeric Values
+    ZERO = 0x00000000
+    NAN = 0x7FC00000
+    PINF = 0x7F800000
+    NINF = 0xFF800000
+
+    # Constants for Conversion
+    BIAS = 127
+    MAX_EXPONENT = 255
+    MANTISSA_BITS = 23
+    SIGN_POSITION = 31
+
+    # Bitwise Masks
+    SIGN_MASK = 0x01
+    EXPONENT_MASK = 0xFF  # Mask is 8-bit
+    MANTISSA_MASK = 0x007FFFFF
 
     def __call__(self, value: float) -> int:
         # Handle Special Cases
         if value == 0:
-            return 0x00000000
+            return self.ZERO
         if math.isnan(value):
-            return 0x7FC00000  # Common representation of NaN
+            return self.NAN
         if math.isinf(value):
-            return (
-                0x7F800000 if value > 0 else 0xFF800000
-            )  # Positive and negative infinity
+            return self.PINF if value > 0 else self.NINF
 
         # Extract the Sign
         sign = 0 if value >= 0 else 1
@@ -112,19 +125,48 @@ class float32(DType):  # WIP
         mantissa, exponent = math.frexp(value)
 
         # Adjust the Exponent for 32-bit float and Add Bias
-        bias = 127
-        exponent = min(max(int(exponent + bias), 0), 255)
+        exponent = min(max(int(exponent + self.BIAS), 0), self.MAX_EXPONENT)
 
         # Convert Mantissa to 23-bit format
-        mantissa = int((mantissa - 1.0) * (2**23)) & 0x7FFFFF
+        mantissa = int((mantissa - 1.0) * (2**self.MANTISSA_BITS)) & self.MANTISSA_MASK
 
         # Combine into a 32-bit format
-        return (sign << 31) | (exponent << 23) | mantissa
+        return (
+            (sign << self.SIGN_POSITION) | (exponent << self.MANTISSA_BITS) | mantissa
+        )
 
-    @staticmethod
-    def to_float(value: int) -> float:
-        # Implement conversion from custom 32-bit to 64-bit float
-        ...  # TODO
+    def to_float(self, value: int) -> float:
+        # Handle special cases
+        if value == self.ZERO:
+            return 0.0
+        if value == self.NAN:
+            return float("nan")
+        if value == self.PINF:
+            return float("inf")
+        if value == self.NINF:
+            return float("-inf")
+
+        # Extract the sign, exponent, and mantissa
+        sign = (value >> self.SIGN_POSITION) & self.SIGN_MASK
+        exponent = (value >> self.MANTISSA_BITS) & self.EXPONENT_MASK
+        mantissa = value & self.MANTISSA_MASK
+
+        # Handle denormalized numbers (exponent is all 0s)
+        if exponent == 0:
+            exponent = 1 - self.BIAS  # Denormalized exponent bias
+        else:
+            mantissa |= 1 << self.MANTISSA_BITS  # Add implicit leading 1 for normalized
+            exponent -= self.BIAS
+
+        # Calculate the floating-point number
+        float_value = (mantissa / (2**self.MANTISSA_BITS)) * (2**exponent)
+        if sign == 1:
+            float_value = -float_value
+
+        return float_value
+
+
+float32 = Float32()
 
 
 class float16(DType):  # TODO
@@ -205,5 +247,8 @@ class float4(DType):  # TODO
         ...
 
     @staticmethod
+    def to_float(value: int) -> float:
+        ...
+
     def to_float(value: int) -> float:
         ...
