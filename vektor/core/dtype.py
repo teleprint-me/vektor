@@ -30,7 +30,7 @@ value = (-1)^sign · 2^(exponent - bias) · mantissa
 ### Conversion Between Python Int and Floating-Point values
 
 1. **From Float to Int (Custom Precision)**:
-   - **Extract Components**: Use `math.frexp()` to break the float into a mantissa and exponent. 
+   - **Extract Components**: Use `math.frexp()` to break the float into a mantissa and exponent.
    - **Normalize and Scale**: Adjust the mantissa and exponent according to your custom precision. This involves scaling and possibly rounding the mantissa, and adjusting the exponent with a custom bias.
    - **Pack into Int**: Combine the sign, exponent, and mantissa into an integer using bitwise operations.
 
@@ -49,7 +49,7 @@ TFloat = float
 TScalar = Union[TBool, TInt, TFloat]
 TVector = List[TScalar]
 TMatrix = List[TVector]
-TShape = Tuple[int, int]
+TShape = Tuple[TInt, TInt]
 
 
 class DType(Protocol, metaclass=ABCMeta):
@@ -74,9 +74,8 @@ class DType(Protocol, metaclass=ABCMeta):
         """
         ...
 
-    @staticmethod
     @abstractmethod
-    def to_float(value: TInt) -> TFloat:
+    def to_float(self, value: TInt) -> TFloat:
         """
         Convert an integer back to its floating-point representation based on the
         custom precision defined by the subclass.
@@ -103,12 +102,15 @@ class Float32(DType):  # WIP
     MANTISSA_BITS = 23
     SIGN_POSITION = 31
 
-    # Bitwise Masks
+    # Bitwise Masks: Specific to converting from int32 to float64.
     SIGN_MASK = 0x01
     EXPONENT_MASK = 0xFF  # Mask is 8-bit
     MANTISSA_MASK = 0x007FFFFF
 
-    def __call__(self, value: float) -> int:
+    def __call__(self, value: TFloat) -> TInt:
+        # NOTE: This method is still returning values with a wide margin of error that can not be ignored.
+        # This is verifiable with `Float32.to_float` which returns proper results.
+        # The current margin of error within this method is acceptable for the time being considering the limitations of the given context.
         # Handle Special Cases
         if value == 0:
             return self.ZERO
@@ -121,21 +123,27 @@ class Float32(DType):  # WIP
         sign = 0 if value >= 0 else 1
         value = abs(value)
 
-        # Normalize the Number
+        # Decompose value into exponent and mantissa
         mantissa, exponent = math.frexp(value)
 
-        # Adjust the Exponent for 32-bit float and Add Bias
-        exponent = min(max(int(exponent + self.BIAS), 0), self.MAX_EXPONENT)
+        # Adjust the exponent for 32-bit float and add the bias
+        exponent = int(exponent + self.BIAS - 1)
 
-        # Convert Mantissa to 23-bit format
-        mantissa = int((mantissa - 1.0) * (2**self.MANTISSA_BITS)) & self.MANTISSA_MASK
+        # Scale the mantissa to fit within the specified range
+        mantissa = round(mantissa * (1 << self.MANTISSA_BITS))
 
-        # Combine into a 32-bit format
-        return (
+        # Clamping the mantissa to fit within 23 bits
+        mantissa = max(0, mantissa)
+        mantissa = min(mantissa, (1 << self.MANTISSA_BITS) - 1)
+
+        # Combine the sign, exponent, and mantissa into a 32-bit format
+        result = (
             (sign << self.SIGN_POSITION) | (exponent << self.MANTISSA_BITS) | mantissa
         )
 
-    def to_float(self, value: int) -> float:
+        return result
+
+    def to_float(self, value: TInt) -> TFloat:
         # Handle special cases
         if value == self.ZERO:
             return 0.0
@@ -169,17 +177,16 @@ class Float32(DType):  # WIP
 float32 = Float32()
 
 
-class float16(DType):  # TODO
-    def __call__(self, value: float) -> int:
-        ...
+class Float16(DType):  # TODO
+    def __call__(self, value: TFloat) -> TInt:
+        raise NotImplementedError
 
-    @staticmethod
-    def to_float(value: int) -> float:
-        ...
+    def to_float(self, value: TInt) -> TFloat:
+        raise NotImplementedError
 
 
-class float8(DType):  # WIP
-    def __call__(self, value: float) -> int:
+class Float8(DType):  # WIP
+    def __call__(self, value: TFloat) -> TInt:
         """
         Convert a value from float64 to float8.
         """
@@ -213,8 +220,7 @@ class float8(DType):  # WIP
         # 6. Pack the Bits: Combine the sign, exponent, and mantissa into an 8-bit format.
         return (sign << 7) | (exponent << 3) | mantissa
 
-    @staticmethod
-    def to_float(value: int) -> float:
+    def to_float(self, value: TInt) -> TFloat:
         """
         Convert a value from 8-bit custom floating point to 64-bit standard floating point.
 
@@ -242,13 +248,9 @@ class float8(DType):  # WIP
         return result
 
 
-class float4(DType):  # TODO
-    def __call__(self, value: float) -> int:
-        ...
+class Float4(DType):  # TODO
+    def __call__(self, value: TFloat) -> TInt:
+        raise NotImplementedError
 
-    @staticmethod
-    def to_float(value: int) -> float:
-        ...
-
-    def to_float(value: int) -> float:
-        ...
+    def to_float(self, value: TInt) -> TFloat:
+        raise NotImplementedError
