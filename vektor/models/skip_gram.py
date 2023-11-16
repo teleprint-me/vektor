@@ -1,5 +1,5 @@
 """
-vektor/skip_gram_model.py
+vektor/models/skip_gram.py
 """
 import random
 from collections import defaultdict
