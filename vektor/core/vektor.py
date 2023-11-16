@@ -4,38 +4,60 @@ vektor/core/vektor.py
 The beating heart of the Vektor package.
 """
 import random
-from typing import Callable, List, Optional, Tuple, Type
+from typing import Callable, List, Optional, Tuple, Type, Union
+
+from vektor.core.dtype import TMatrix, TScalar, TShape, TTensor, TVector
 
 
 class Vektor:
     def __init__(
         self,
-        matrix: Optional[List[List[float]]] = None,
-        shape: Optional[Tuple[int, int]] = None,
+        data: Optional[TTensor] = None,
+        shape: Optional[TShape] = None,
         dtype: Type = float,
     ) -> None:
         """
         Initialize the Vektor instance with a given shape, data type, or an existing matrix.
-
-        :param matrix: A list of lists representing a matrix. Used if shape is None.
-        :param shape: A tuple representing the dimensions of the matrix. Used if matrix is None.
-        :param dtype: The data type of the matrix elements, default is float.
         """
-        if matrix is not None:
-            self.matrix = matrix
-            self.dtype = type(matrix[0][0])
+        self._dtype = dtype
+
+        if data is not None:
+            if isinstance(data, dtype):  # Scalar
+                self._matrix = [[dtype(data)]]
+            elif all(isinstance(item, dtype) for item in data):  # 1D Vector
+                self._matrix = [[dtype(item)] for item in data]  # Column vector
+            else:  # 2D Matrix
+                self._matrix = [[dtype(item) for item in row] for row in data]
         else:
-            self.matrix = [
-                [dtype(random.gauss(0, 1)) for _ in range(shape[1])]
-                for _ in range(shape[0])
-            ]
-            self.dtype = dtype
+            # Initialize with zeros if shape is given
+            self._matrix = (
+                [[dtype(0) for _ in range(shape[1])] for _ in range(shape[0])]
+                if shape
+                else []
+            )
+
+    def __getitem__(self, key) -> TMatrix:
+        return self._matrix[key]
+
+    def __setitem__(self, index: int, data: TMatrix) -> None:
+        if index >= len(self._matrix):
+            self._matrix.append(data)
+        else:
+            self._matrix[index] = data
+
+    def __len__(self) -> int:
+        return len(self._matrix)
+
+    def __contains__(self, data: TMatrix) -> bool:
+        return data in self._matrix
 
     def __repr__(self) -> str:
         """
         String representation of the matrix.
         """
-        return "\n".join(["\t".join(map(str, row)) for row in self.matrix])
+        # NOTE: Keep the old line just in case.
+        # return "\n".join(["\t".join(map(str, row)) for row in self.matrix])
+        return "\n".join(str(row) for row in self.matrix)
 
     def __elementwise__(
         self, other: "Vektor", operation: Callable[[float, float], float]
@@ -78,6 +100,14 @@ class Vektor:
         )
 
     @property
+    def dtype(self) -> TScalar:
+        return self._dtype
+
+    @property
+    def matrix(self) -> TMatrix:
+        return self._matrix
+
+    @property
     def T(self) -> "Vektor":
         """
         Transpose the matrix.
@@ -89,17 +119,46 @@ class Vektor:
                 [self.matrix[j][i] for j in range(len(self.matrix))]
                 for i in range(len(self.matrix[0]))
             ],
-            self.dtype,
+            dtype=self.dtype,
         )
 
     @property
-    def shape(self) -> Tuple[int, int]:
+    def shape(self) -> TShape:
         """
         Get the shape of the matrix.
 
         :return: A tuple representing the dimensions of the matrix.
         """
         return len(self.matrix), len(self.matrix[0])
+
+    @shape.setter
+    def shape(self, new_shape: TShape) -> None:
+        """
+        Reshape the vector to a new shape if possible.
+
+        :param new_shape: A tuple representing the desired new shape.
+        :raises ValueError: If the new shape is not compatible with the current number of elements.
+        """
+        # Calculate the total elements for the new shape
+        new_total_elements = new_shape[0] * new_shape[1]
+
+        # Calculate the current total elements
+        current_total_elements = self.shape[0] * self.shape[1]
+
+        if new_total_elements != current_total_elements:
+            raise ValueError(
+                "New shape is not compatible with the current number of elements"
+            )
+
+        # Create a new matrix with the new shape
+        new_matrix = [
+            [self.matrix[j][i] for j in range(new_shape[0])]
+            for i in range(new_shape[1])
+        ]
+
+        # Update the matrix and shape attributes
+        self._matrix = new_matrix
+        self._shape = new_shape
 
 
 # Example usage:
