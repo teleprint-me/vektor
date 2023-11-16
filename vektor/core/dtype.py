@@ -46,9 +46,12 @@ from typing import List, Protocol, Tuple, Union
 TBool = bool
 TInt = int
 TFloat = float
-TScalar = Union[TBool, TInt, TFloat]
+TComplex = complex
+TScalar = Union[TBool, TInt, TFloat, TComplex]
 TVector = List[TScalar]
 TMatrix = List[TVector]
+TTensor2D = TMatrix  # 2D tensor (matrix)
+TTensor3D = List[TMatrix]  # 3D tensor (list of matrices)
 TShape = Tuple[TInt, TInt]
 
 
