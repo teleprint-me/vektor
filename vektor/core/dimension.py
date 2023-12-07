@@ -54,19 +54,25 @@ def initialize_2d_zero_matrix(
     - ValueError: If the provided shape is not a tuple of two non-negative integers.
 
     Example:
-    >>> initialize_zero_matrix(shape=(2, 3), dtype=int)
+    >>> initialize_2d_zero_matrix(shape=(2, 3), dtype=int)
     [[0, 0, 0], [0, 0, 0]]
 
-    >>> initialize_zero_matrix()
+    >>> initialize_2d_zero_matrix()
     []
     """
     if shape is not None:
-        if not (
-            isinstance(shape, tuple)
-            and len(shape) == 2
-            and all(isinstance(dim, int) and dim >= 0 for dim in shape)
-        ):
-            raise ValueError("Shape must be a tuple of two non-negative integers.")
+        if not isinstance(shape, tuple):
+            raise ValueError("Shape must be a tuple.")
+
+        if len(shape) != 2:
+            raise ValueError("Shape must be a tuple of two elements (rows, columns).")
+
+        rows, cols = shape
+        if not (isinstance(rows, int) and rows >= 0):
+            raise ValueError("Number of rows must be a non-negative integer.")
+
+        if not (isinstance(cols, int) and cols >= 0):
+            raise ValueError("Number of columns must be a non-negative integer.")
 
     rows, cols = shape if shape is not None else (0, 0)
     return [[dtype(0) for _ in range(cols)] for _ in range(rows)]
