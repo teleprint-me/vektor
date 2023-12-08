@@ -124,48 +124,42 @@ def add_noise_to_matrix(
     return noisy_matrix
 
 
-def create_1d_matrix(
-    data: Optional[TVector] = None,
-    shape: Optional[TShape] = None,
-    dtype: Optional[TScalar] = float,
+def create_column_matrix_from_vector(
+    vector: TVector, dtype: TScalar = float
 ) -> TMatrix:
     """
-    Create a 1D matrix (vector) from a list of data or a specified shape.
+    Convert a 1D vector into a column matrix.
 
     Parameters:
-    - data (Optional[TVector]): List of scalar values to populate the vector. If not provided, shape is used.
-    - shape (Optional[TShape]): Tuple specifying the shape of the vector as (length,). Ignored if data is provided.
-    - dtype (Optional[TScalar]): The data type of matrix elements. Defaults to float.
+    - vector (TVector): A list of scalar values.
+    - dtype (TScalar): The data type of matrix elements. Defaults to float.
 
     Returns:
-    - TMatrix: 2D matrix representation of the vector.
-
-    Raises:
-    - ValueError: If provided data or shape is invalid.
+    - TMatrix: A column matrix (2D list) representing the vector.
 
     Example:
-    >>> create_1d_matrix(data=[1, 2, 3])
+    >>> create_column_matrix_from_vector([1, 2, 3])
     [[1], [2], [3]]
-
-    >>> create_1d_matrix(shape=(3,), dtype=int)
-    [[0], [0], [0]]
     """
-    if data is not None:
-        if not isinstance(data, list):
-            raise ValueError("Data must be a list.")
-        return [[dtype(item)] for item in data]
+    return [[dtype(item)] for item in vector]
 
-    if shape is not None:
-        if not (
-            isinstance(shape, tuple)
-            and len(shape) == 1
-            and isinstance(shape[0], int)
-            and shape[0] >= 0
-        ):
-            raise ValueError("Shape must be a tuple of one non-negative integer.")
-        return [[dtype(0)] for _ in range(shape[0])]
 
-    return []
+def create_row_matrix_from_vector(vector: TVector, dtype: TScalar = float) -> TMatrix:
+    """
+    Convert a 1D vector into a row matrix.
+
+    Parameters:
+    - vector (TVector): A list of scalar values.
+    - dtype (TScalar): The data type of matrix elements. Defaults to float.
+
+    Returns:
+    - TMatrix: A row matrix (2D list) representing the vector.
+
+    Example:
+    >>> create_row_matrix_from_vector([1, 2, 3])
+    [[1, 2, 3]]
+    """
+    return [list(map(dtype, vector))]
 
 
 def create_2d_matrix(
