@@ -97,11 +97,16 @@ def add_noise_to_matrix(
     - TMatrix: A new matrix with noise added to its elements.
 
     Raises:
-    - ValueError: If callback is not a callable function.
+    - ValueError: If callback is not a callable function or matrix is empty or improperly structured.
 
     Example:
     >>> add_noise_to_matrix(matrix, noise_level=0.1, callback=random.gauss, mu=0.0, sigma=1.0)
     """
+    if not matrix:
+        raise ValueError("Matrix is empty.")
+
+    if not all(len(row) == len(matrix[0]) for row in matrix):
+        raise ValueError("All rows in the matrix must have the same length.")
 
     if seed is not None:
         random.seed(seed)
