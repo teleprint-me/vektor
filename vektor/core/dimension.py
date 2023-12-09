@@ -30,9 +30,9 @@ This would be similar to numpy.random.randn or numpy.Generator.normal
 It's better to start thinking about things like this early on rather than later.
 """
 import random
-from typing import Callable, List, Optional
+from typing import Callable, Optional
 
-from vektor.core.dtype import TMatrix, TScalar, TShape, TVector
+from vektor.core.dtype import TMatrix, TScalar, TShape, TTensor2D, TTensor3D, TVector
 
 
 def initialize_2d_zero_matrix(
@@ -205,17 +205,54 @@ def create_2d_matrix(
 
 
 def create_3d_matrix(
-    data: List[TMatrix],
-    shape: Optional[TShape],
+    data: TTensor3D = None,
+    shape: Optional[TShape] = None,
     dtype: TScalar = float,
-) -> TMatrix:
+) -> TTensor3D:
     """
-    Create a 3D matrix from a list of lists of lists.
+    Create a 3D tensor (matrix) from a list of 2D matrices or by initializing a tensor of a given shape.
 
-    :param data: List of lists of lists representing the matrix.
-    :return: 3D matrix.
+    Parameters:
+    - data (TTensor3D): List of 2D matrices representing the tensor.
+    - shape (Optional[TShape]): Shape of the tensor to initialize if data is not provided.
+    - dtype (TScalar): The data type of tensor elements. Defaults to float.
+
+    Returns:
+    - TTensor3D: A 3D tensor (list of 2D matrices).
+
+    Raises:
+    - ValueError: If both data and shape are provided, or if neither is provided.
+                  If data matrices have inconsistent shapes.
+
+    Example:
+    >>> create_3d_matrix(data=[[[1, 2], [3, 4]], [[5, 6], [7, 8]]])
+    [[[1.0, 2.0], [3.0, 4.0]], [[5.0, 6.0], [7.0, 8.0]]]
+
+    >>> create_3d_matrix(shape=(2, 2, 2))
+    [[[0.0, 0.0], [0.0, 0.0]], [[0.0, 0.0], [0.0, 0.0]]]
     """
-    return data
+    if data is not None and shape is not None:
+        raise ValueError("Cannot specify both data and shape.")
+
+    if data is None and shape is None:
+        raise ValueError("Must specify either data or shape.")
+
+    if data is not None:
+        # Check if data matrices have consistent shapes
+        rows, cols = len(data[0]), len(data[0][0])
+        if not all(
+            len(matrix) == rows and all(len(row) == cols for row in matrix)
+            for matrix in data
+        ):
+            raise ValueError("All data matrices must have the same shape.")
+
+        return [[[dtype(item) for item in row] for row in matrix] for matrix in data]
+
+    # Initialize a 3D tensor with zeros based on the specified shape
+    depth, rows, cols = shape if shape is not None else (0, 0, 0)
+    return [
+        [[dtype(0) for _ in range(cols)] for _ in range(rows)] for _ in range(depth)
+    ]
 
 
 def reshape_matrix(matrix: TMatrix, shape: TShape, new_shape: TShape) -> TMatrix:
