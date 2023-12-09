@@ -32,23 +32,23 @@ It's better to start thinking about things like this early on rather than later.
 import random
 from typing import Callable, Optional
 
-from vektor.core.dtype import TMatrix, TScalar, TShape, TTensor2D, TTensor3D, TVector
+from vektor.core.dtype import TScalar, TShape2D, TTensor2D, TTensor3D, TVector
 
 
 def initialize_2d_zero_matrix(
-    shape: Optional[TShape] = None,
+    shape: Optional[TShape2D] = None,
     dtype: Optional[TScalar] = float,
-) -> TMatrix:
+) -> TTensor2D:
     """
     Create and initialize a 2D matrix filled with zeros.
 
     Parameters:
-    - shape (Optional[TShape]): A tuple representing the desired shape of the matrix
+    - shape (Optional[TShape2D]): A tuple representing the desired shape of the matrix
                                 as (rows, columns). If None, an empty matrix is returned.
     - dtype (Optional[TScalar]): The data type of matrix elements. Defaults to float.
 
     Returns:
-    - TMatrix: A 2D matrix (list of lists) initialized with zeros.
+    - TTensor2D: A 2D matrix (list of lists) initialized with zeros.
 
     Raises:
     - ValueError: If the provided shape is not a tuple of two non-negative integers.
@@ -78,23 +78,35 @@ def initialize_2d_zero_matrix(
     return [[dtype(0) for _ in range(cols)] for _ in range(rows)]
 
 
+def initialize_3d_zero_matrix() -> TTensor3D:
+    """
+    Create and initialize a 3D matrix filled with zeros.
+
+    Parameters:
+    - shape (Optional[TShape3D]): A tuple representing the desired shape of the matrix
+                                as (rows, columns). If None, an empty matrix is returned.
+    - dtype (Optional[TScalar]): The data type of matrix elements. Defaults to float.
+    """
+    ...
+
+
 def add_noise_to_matrix(
-    matrix: TMatrix,
+    matrix: TTensor2D,
     callback: Optional[Callable] = None,
     seed: Optional[int] = None,
     **kwargs,
-) -> TMatrix:
+) -> TTensor2D:
     """
     Add noise to each element of a matrix.
 
     Parameters:
-    - matrix (TMatrix): The input matrix.
+    - matrix (TTensor2D): The input matrix.
     - callback (Optional[Callable]): A callback function for generating noise. Defaults to random.gauss.
     - seed (Optional[int]): The seed for the random number generator. If None, no seed is used.
     - **kwargs: Additional keyword arguments for the noise generation function.
 
     Returns:
-    - TMatrix: A new matrix with noise added to its elements.
+    - TTensor2D: A new matrix with noise added to its elements.
 
     Raises:
     - ValueError: If callback is not a callable function or matrix is empty or improperly structured.
@@ -126,7 +138,7 @@ def add_noise_to_matrix(
 
 def create_column_matrix_from_vector(
     vector: TVector, dtype: TScalar = float
-) -> TMatrix:
+) -> TTensor2D:
     """
     Convert a 1D vector into a column matrix.
 
@@ -135,7 +147,7 @@ def create_column_matrix_from_vector(
     - dtype (TScalar): The data type of matrix elements. Defaults to float.
 
     Returns:
-    - TMatrix: A column matrix (2D list) representing the vector.
+    - TTensor2D: A column matrix (2D list) representing the vector.
 
     Example:
     >>> create_column_matrix_from_vector([1, 2, 3])
@@ -144,7 +156,7 @@ def create_column_matrix_from_vector(
     return [[dtype(item)] for item in vector]
 
 
-def create_row_matrix_from_vector(vector: TVector, dtype: TScalar = float) -> TMatrix:
+def create_row_matrix_from_vector(vector: TVector, dtype: TScalar = float) -> TTensor2D:
     """
     Convert a 1D vector into a row matrix.
 
@@ -153,7 +165,7 @@ def create_row_matrix_from_vector(vector: TVector, dtype: TScalar = float) -> TM
     - dtype (TScalar): The data type of matrix elements. Defaults to float.
 
     Returns:
-    - TMatrix: A row matrix (2D list) representing the vector.
+    - TTensor2D: A row matrix (2D list) representing the vector.
 
     Example:
     >>> create_row_matrix_from_vector([1, 2, 3])
@@ -163,21 +175,21 @@ def create_row_matrix_from_vector(vector: TVector, dtype: TScalar = float) -> TM
 
 
 def create_2d_matrix(
-    data: Optional[TMatrix] = None,
-    shape: Optional[TShape] = None,
+    data: Optional[TTensor2D] = None,
+    shape: Optional[TShape2D] = None,
     dtype: TScalar = float,
-) -> TMatrix:
+) -> TTensor2D:
     """
     Create a 2D matrix from a list of lists or by initializing a matrix of a given shape.
 
     Parameters:
-    - data (Optional[TMatrix]): List of lists representing the matrix.
+    - data (Optional[TTensor2D]): List of lists representing the matrix.
                                 If provided, overrides shape.
-    - shape (Optional[TShape]): Shape of the matrix to initialize if data is not provided.
+    - shape (Optional[TShape2D]): Shape of the matrix to initialize if data is not provided.
     - dtype (TScalar): The data type of matrix elements. Defaults to float.
 
     Returns:
-    - TMatrix: A 2D matrix.
+    - TTensor2D: A 2D matrix.
 
     Raises:
     - ValueError: If both data and shape are provided, or if neither is provided.
@@ -206,7 +218,7 @@ def create_2d_matrix(
 
 def create_3d_matrix(
     data: TTensor3D = None,
-    shape: Optional[TShape] = None,
+    shape: Optional[TShape2D] = None,
     dtype: TScalar = float,
 ) -> TTensor3D:
     """
@@ -214,7 +226,7 @@ def create_3d_matrix(
 
     Parameters:
     - data (TTensor3D): List of 2D matrices representing the tensor.
-    - shape (Optional[TShape]): Shape of the tensor to initialize if data is not provided.
+    - shape (Optional[TShape2D]): Shape of the tensor to initialize if data is not provided.
     - dtype (TScalar): The data type of tensor elements. Defaults to float.
 
     Returns:
@@ -255,7 +267,11 @@ def create_3d_matrix(
     ]
 
 
-def reshape_matrix(matrix: TMatrix, shape: TShape, new_shape: TShape) -> TMatrix:
+def reshape_matrix(
+    matrix: TTensor2D,
+    shape: TShape2D,
+    new_shape: TShape2D,
+) -> TTensor2D:
     """
     Reshape a matrix to a new shape if possible.
 
