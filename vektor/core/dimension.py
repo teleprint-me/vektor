@@ -163,17 +163,45 @@ def create_row_matrix_from_vector(vector: TVector, dtype: TScalar = float) -> TM
 
 
 def create_2d_matrix(
-    data: Optional[TMatrix],
-    shape: Optional[TShape],
+    data: Optional[TMatrix] = None,
+    shape: Optional[TShape] = None,
     dtype: TScalar = float,
 ) -> TMatrix:
     """
-    Create a 2D matrix from a list of lists.
+    Create a 2D matrix from a list of lists or by initializing a matrix of a given shape.
 
-    :param data: List of lists representing the matrix.
-    :return: 2D matrix.
+    Parameters:
+    - data (Optional[TMatrix]): List of lists representing the matrix.
+                                If provided, overrides shape.
+    - shape (Optional[TShape]): Shape of the matrix to initialize if data is not provided.
+    - dtype (TScalar): The data type of matrix elements. Defaults to float.
+
+    Returns:
+    - TMatrix: A 2D matrix.
+
+    Raises:
+    - ValueError: If both data and shape are provided, or if neither is provided.
+                  If data rows are of inconsistent lengths.
+
+    Example:
+    >>> create_2d_matrix(data=[[1, 2], [3, 4]])
+    [[1.0, 2.0], [3.0, 4.0]]
+
+    >>> create_2d_matrix(shape=(2, 2))
+    [[0.0, 0.0], [0.0, 0.0]]
     """
-    return data
+    if data is not None and shape is not None:
+        raise ValueError("Cannot specify both data and shape.")
+
+    if data is None and shape is None:
+        raise ValueError("Must specify either data or shape.")
+
+    if data is not None:
+        if not all(len(row) == len(data[0]) for row in data):
+            raise ValueError("All rows in the data must have the same length.")
+        return [[dtype(item) for item in row] for row in data]
+
+    return initialize_2d_zero_matrix(shape, dtype)
 
 
 def create_3d_matrix(
