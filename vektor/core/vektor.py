@@ -1,23 +1,23 @@
 """
-vektor/core/vektor.py
+Module: vektor.core.matrix
 
 The beating heart of the Vektor package.
 """
 import random
-from typing import Callable, List, Optional, Tuple, Type, Union
+from typing import Callable, Optional
 
-from vektor.core.dtype import TMatrix, TScalar, TShape, TTensor, TVector
+from vektor.core.dtype import TMatrix, TScalar, TShape
 
 
-class Vektor:
+class Matrix:
     def __init__(
         self,
-        data: Optional[TTensor] = None,
+        data: Optional[TMatrix] = None,
         shape: Optional[TShape] = None,
-        dtype: Type = float,
+        dtype: TScalar = float,
     ) -> None:
         """
-        Initialize the Vektor instance with a given shape, data type, or an existing matrix.
+        Initialize the Matrix instance with a given shape, data type, or an existing matrix.
         """
         self._dtype = dtype
 
@@ -60,14 +60,14 @@ class Vektor:
         return "\n".join(str(row) for row in self.matrix)
 
     def __elementwise__(
-        self, other: "Vektor", operation: Callable[[float, float], float]
-    ) -> "Vektor":
+        self, other: "Matrix", operation: Callable[[float, float], float]
+    ) -> "Matrix":
         if self.shape != other.shape:
             raise ValueError(
                 "Matrix shapes must be identical for elementwise operations"
             )
 
-        return Vektor(
+        return Matrix(
             [
                 [
                     operation(self.matrix[i][j], other.matrix[i][j])
@@ -78,20 +78,20 @@ class Vektor:
             dtype=self.dtype,
         )
 
-    def __add__(self, other: "Vektor") -> "Vektor":
+    def __add__(self, other: "Matrix") -> "Matrix":
         return self.__elementwise__(other, lambda x, y: x + y)
 
-    def __sub__(self, other: "Vektor") -> "Vektor":
+    def __sub__(self, other: "Matrix") -> "Matrix":
         return self.__elementwise__(other, lambda x, y: x - y)
 
-    def __mul__(self, other: "Vektor") -> "Vektor":
+    def __mul__(self, other: "Matrix") -> "Matrix":
         return self.__elementwise__(other, lambda x, y: x * y)
 
-    def __matmul__(self, other: "Vektor") -> "Vektor":
+    def __matmul__(self, other: "Matrix") -> "Matrix":
         if len(self.matrix[0]) != len(other.matrix):
             raise ValueError("Shapes are not aligned for matrix multiplication")
 
-        return Vektor(
+        return Matrix(
             [
                 [sum(a * b for a, b in zip(row, col)) for col in zip(*other.matrix)]
                 for row in self.matrix
@@ -108,13 +108,13 @@ class Vektor:
         return self._matrix
 
     @property
-    def T(self) -> "Vektor":
+    def T(self) -> "Matrix":
         """
         Transpose the matrix.
 
-        :return: A new Vektor instance representing the transposed matrix.
+        :return: A new Matrix instance representing the transposed matrix.
         """
-        return Vektor(
+        return Matrix(
             [
                 [self.matrix[j][i] for j in range(len(self.matrix))]
                 for i in range(len(self.matrix[0]))
@@ -172,16 +172,16 @@ if __name__ == "__main__":
 
             :param num_inputs: Number of input connections to the neuron.
             """
-            self.weights = Vektor(shape=(1, num_inputs))  # Random weights
-            self.bias = Vektor(matrix=[[random.gauss(0, 1)]])  # Random bias
+            self.weights = Matrix(shape=(1, num_inputs))  # Random weights
+            self.bias = Matrix(matrix=[[random.gauss(0, 1)]])  # Random bias
 
         def activate(
-            self, inputs: Vektor, activation_function: Callable[[float], float]
+            self, inputs: Matrix, activation_function: Callable[[float], float]
         ) -> float:
             """
             Activate the neuron with the given inputs and activation function.
 
-            :param inputs: Input values as a Vektor.
+            :param inputs: Input values as a Matrix.
             :param activation_function: A function to apply to the weighted sum.
             :return: The output of the neuron.
             """
@@ -198,7 +198,7 @@ if __name__ == "__main__":
     neuron = Neuron(num_inputs=3)
 
     # Example input
-    inputs = Vektor(matrix=[[0.5, -1, 0.2]])
+    inputs = Matrix(matrix=[[0.5, -1, 0.2]])
 
     # Activate the neuron
     output = neuron.activate(inputs, sigmoid)
