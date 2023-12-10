@@ -1,34 +1,24 @@
 """
 Module: vektor.core.dimension
 
-I need to know the data type for each item in the matrix if we're instantiating from scratch.
+This module provides functions for initializing, manipulating, and reshaping matrices and tensors.
+It is part of the Vektor toolkit, designed to support various numerical and machine learning tasks.
 
-I don't need to know the data type if we're already given the information we need, e.g. the list it self.
+Key Functions:
+- `initialize_zero_matrix(shape, dtype)`: Initialize a 2D matrix filled with zeros.
+- `add_noise_to_matrix(matrix, callback, seed, **kwargs)`: Add noise to a 2D matrix.
+- `create_column_matrix_from_vector(vector, dtype)`: Convert a 1D vector to a column matrix.
+- `create_row_matrix_from_vector(vector, dtype)`: Convert a 1D vector to a row matrix.
+- `create_matrix(data, shape, dtype)`: Create a 2D matrix from data or specified shape.
+- `reshape_matrix(matrix, shape, new_shape)`: Reshape a matrix to a new shape.
 
-I need to instantiate a zeroed out list upon creation if it's empty.
+Note:
+- This module is part of the Vektor project, aiming to facilitate matrix and tensor operations.
+- Functions provide error handling for invalid inputs and raise `ValueError` when necessary.
 
-I need to know the shape if nothing is given.
-This pattern should hold across other functions as well.
-
-I might want to implement something that allows us to introduce noise as well.
-Maybe a helper function for instantiating random values.
-
-    matrix = [
-        [
-            dtype(random.gauss(0, 1))
-            for _ in range(shape[1])
-        ]
-        for _ in range(shape[0])
-    ]
-
-This would be similar to numpy.random.randn or numpy.Generator.normal
-
-    rng = np.random.default_rng()  # Random number generator instance
-    size = (self.input_dim, self.output_dim)
-    distribution = rng.standard_normal(size=size, dtype=self.dtype)
-
-It's better to start thinking about things like this early on rather than later.
+For detailed function descriptions and examples, see individual function docstrings.
 """
+
 import random
 from typing import Callable, Optional
 
@@ -137,6 +127,18 @@ def add_noise_to_matrix(
 
     noisy_matrix = [[item + callback(**kwargs) for item in row] for row in matrix]
     return noisy_matrix
+
+
+def add_noise_to_tensor(
+    tensor: TTensor,
+    callback: Optional[Callable] = None,
+    seed: Optional[int] = None,
+    **kwargs,
+) -> TTensor:
+    """
+    Add noise to each element of a tensor (3D matrix).
+    """
+    ...
 
 
 def create_column_matrix_from_vector(
@@ -302,3 +304,14 @@ def reshape_matrix(
     ]
 
     return new_matrix
+
+
+def reshape_tensor(
+    matrix: TTensor,
+    shape: TShape,
+    new_shape: TShape,
+) -> TTensor:
+    """
+    Reshape a matrix to a new shape if possible.
+    """
+    ...
