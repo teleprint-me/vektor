@@ -5,6 +5,7 @@
   "editor.wordWrap": "on",
   "editor.fontSize": 12,
   "editor.fontFamily": "'Noto Sans Mono', 'Source Code Pro', 'Droid Sans Mono'",
+  "terminal.integrated.stickyScroll.enabled": false,
   "[markdown]": {
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
@@ -35,7 +36,7 @@
     "editor.formatOnSave": true,
     "editor.formatOnPaste": false,
     "editor.codeActionsOnSave": {
-      "source.organizeImports": true
+      "source.organizeImports": "explicit"
     }
   },
   "isort.args": ["--profile", "black"],
@@ -48,7 +49,7 @@
     "editor.formatOnType": true,
     "editor.trimAutoWhitespace": true,
     "editor.codeActionsOnSave": {
-      "source.fixAll": true
+      "source.fixAll": "explicit"
     }
   },
   "[c]": {
