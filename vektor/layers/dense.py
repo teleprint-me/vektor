@@ -81,7 +81,7 @@ class Dense(Layer[TArray]):
         self.biases = np.zeros((1, self.output_dim), dtype=self.dtype)
 
     @property
-    def architecture(self) -> Mapping[str, Any]:
+    def specification(self) -> Mapping[str, Any]:
         """
         Returns the architectural details of the layer in a predefined format.
         """
