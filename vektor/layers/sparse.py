@@ -3,6 +3,8 @@ tmnn/layers/sparse.py
 
 This module defines the Sparse layer class for neural networks.
 """
+from typing import Any, Dict, Mapping, Tuple, Union
+
 import numpy as np
 from scipy.sparse import csr_matrix
 
@@ -29,6 +31,7 @@ class Sparse(Layer[TArray]):
         self.output_dim = output_dim
         self.sparsity = sparsity_level
         self.dtype = dtype
+        self.seed = seed
         self.weights = None
         self.biases = None
 
@@ -54,6 +57,34 @@ class Sparse(Layer[TArray]):
         # NOTE: self.weights is a scipy.sparse.csr_matrix object.
         self.weights = csr_matrix(norm_rand, dtype=self.dtype)
         self.biases = np.zeros(self.output_dim, dtype=self.dtype)
+
+    @property
+    def specification(self) -> Mapping[str, Any]:
+        """
+        Returns the architectural details of the layer in a predefined format.
+        """
+        return {
+            "type": "sparse",
+            "input_dim": self.input_dim,
+            "output_dim": self.output_dim,
+            "dtype": self.dtype,
+            "sparsity": self.sparsity,
+            "seed": self.seed,
+        }
+
+    @property
+    def dimensions(self) -> Tuple[int, int]:
+        """
+        Returns the shape of the layer.
+        """
+        return self.input_dim, self.output_dim
+
+    @property
+    def state(self) -> Tuple[TArray, TArray]:
+        """
+        Returns the state of the layer.
+        """
+        return self.input, self.output
 
     def forward(self, input_data):
         """
@@ -93,19 +124,19 @@ class Sparse(Layer[TArray]):
 
         return input_gradient
 
-    def get_dimensions(self):
-        return self.input_dim, self.output_dim
-
-    def get_state(self):
-        return self.input, self.output
-
-    def get_params(self):
+    def get_params(self) -> Dict[str, Union[TArray, np.floating]]:
         """
-        Get the current weights, biases, and data type of the layer.
+        Get the current weights and biases of the layer.
         """
-        return self.weights, self.biases, self.dtype
+        return {
+            "weights": self.weights,
+            "biases": self.biases,
+            "dtype": self.dtype,
+        }
 
-    def set_params(self, weights, biases, dtype=np.float32):
+    def set_params(
+        self, weights: TArray, biases: TArray, dtype: np.floating = np.float32
+    ) -> None:
         """
         Set the weights and biases of the layer.
         """
