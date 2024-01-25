@@ -1,5 +1,5 @@
 """
-vektor/tokenizer.py
+vektor/encoders/tokenizer.py
 """
 import binascii
 import re
