@@ -8,24 +8,24 @@ readme = "README.md"
 
 [tool.poetry.dependencies]
 python = ">=3.11"
-beautifulsoup4 = "^4.12.2"
+beautifulsoup4 = "^4.12.3"
 html2text = "^2020.1.16"
 mdformat = "^0.7.17"
 click = "^8.1.7"
 tqdm = "^4.66.1"
 numpy = "^1.26.2"
-scipy = "^1.11.4"
+scipy = "^1.12.0"
 h5py = "^3.10.0"
 
 [tool.poetry.dev-dependencies]
 bpython = "^0.24"
-ruff = "^0.1.6"
+ruff = "^0.1.14"
 isort = "^5.12.0"
 pytest = "^7.4.3"
 build = "^1.0.3"
 mkdocs = "^1.5.3"
 mkdocstrings = {version = "^0.24.0", extras = ["python"]}
-mkdocs-material = "^9.4.14"
+mkdocs-material = "^9.5.5"
 
 [tool.poetry.urls]
 "Documentation" = "https://github.com/teleprint-me/vektor/tree/main/docs"
