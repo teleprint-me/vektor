@@ -1,9 +1,7 @@
 """
-vektor/sparse_encoder.py
+vektor/encoders/sparse.py
 """
-import binascii
-
-from vektor.tokenizer import Tokenizer
+from vektor.encoders.tokenizer import Tokenizer
 
 
 # For demonstration purposes, let's define a simple class for Sparse Encoding
