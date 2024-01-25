@@ -4,9 +4,12 @@ vektor/activations/softmax.py
 This module defines the Softmax activation layer class for neural networks.
 """
 
+from typing import Any, Mapping
+
 import numpy as np
 
 from vektor.base.activation import Activation, TArray
+from vektor.base.exceptions import NotSupportedError
 
 
 # NOTE: Forward and backward methods are inherited from Activation class
@@ -66,3 +69,6 @@ class Softmax(Activation):
             numpy.ndarray: Placeholder for the derivative (not used).
         """
         pass
+
+    def backward(self, output_gradient: TArray, **kwargs: Mapping[str, Any]) -> TArray:
+        raise NotSupportedError("The backward method is not supported for Softmax.")
