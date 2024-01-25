@@ -71,4 +71,14 @@ class Softmax(Activation):
         pass
 
     def backward(self, output_gradient: TArray, **kwargs: Mapping[str, Any]) -> TArray:
+        """
+        Override the parent backward method.
+
+        Raises:
+            NotSupportedError: This method is not supported for the Softmax activation.
+
+        Args:
+            output_gradient (TArray): The gradient of the loss with respect to the output of the Activation layer.
+            **kwargs (Mapping[str, Any]): Additional keyword arguments (not used).
+        """
         raise NotSupportedError("The backward method is not supported for Softmax.")
