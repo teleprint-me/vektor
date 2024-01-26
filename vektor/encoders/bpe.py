@@ -8,21 +8,28 @@ Code: https://github.com/rsennrich/subword-nmt
 
 import collections
 import re
+from typing import Dict, List, Optional, Tuple
 
 
 class BytePairEncoding:
-    def __init__(self, num_merges=1000):
+    def __init__(
+        self,
+        n_merges: Optional[int] = 10000,
+        stop_token: Optional[str] = "</w>",
+        unk_token: Optional[str] = "</u>",
+    ):
         """
         Initialize the BytePairEncoding class.
 
         Args:
-            num_merges (int): The number of merges to perform during tokenization.
+            n_merges (int): The number of merges to perform during tokenization.
         """
-        self.num_merges = num_merges
+        self.n_merges = n_merges
         self.vocab = collections.defaultdict(int)
-        self.stop = " </w>"
+        self.stop = f" {stop_token}"
+        self.unknown = unk_token
 
-    def train(self, corpus):
+    def train(self, corpus: List[str]) -> None:
         """
         Train the BytePairEncoding model on a given corpus.
 
@@ -31,7 +38,7 @@ class BytePairEncoding:
         """
         self._set_vocab(corpus)
 
-        for _ in range(self.num_merges):
+        for _ in range(self.n_merges):
             pairs = self._get_stats()
             if not pairs:
                 break
@@ -51,6 +58,22 @@ class BytePairEncoding:
         # Initialize the list of tokens with individual characters
         tokens = list(text)
         return self._tokenize_with_vocab(tokens)
+
+    def get_token_length(self, token) -> int:
+        if token.endswith(self.stop):
+            # Adjust length to account for stop token
+            return len(token) - len(self.stop) + 1
+        else:
+            return len(token)
+
+    def sort_tokens(self, tokens_frequencies):
+        sorted_tokens_tuple = sorted(
+            tokens_frequencies.items(),
+            key=lambda item: (self._get_token_length(item[0]), item[1]),
+            reverse=True,
+        )
+        sorted_tokens = [token for (token, freq) in sorted_tokens_tuple]
+        return sorted_tokens
 
     def get_token_info(self):
         """
@@ -73,7 +96,7 @@ class BytePairEncoding:
 
         return frequency_map, token_map
 
-    def _set_vocab(self, corpus: list[str]) -> None:
+    def _set_vocab(self, corpus: List[str]) -> None:
         """
         Set the vocabulary based on the given corpus.
 
@@ -98,7 +121,7 @@ class BytePairEncoding:
                 # Add token to vocab using a unique integer.
                 self.vocab[token] += 1
 
-    def _get_stats(self):
+    def _get_stats(self) -> Dict[Tuple[str, str], int]:
         """
         Calculate token pair frequencies based on the current vocabulary.
 
@@ -115,7 +138,7 @@ class BytePairEncoding:
                 pairs[pair] += freq
         return pairs
 
-    def _merge_tokens(self, pair: tuple[str, str]) -> None:
+    def _merge_tokens(self, pair: Tuple[str, str]) -> None:
         """
         Merge tokens in the vocabulary based on a given pair.
 
@@ -148,7 +171,7 @@ class BytePairEncoding:
 
 if __name__ == "__main__":
     # Example usage:
-    bpe = BytePairEncoding(num_merges=100)
+    bpe = BytePairEncoding(n_merges=100)
     corpus = ["This is a sample text.", "Byte-Pair Encoding is cool!"]
     bpe.train(corpus)
     print(bpe.tokenize("Encoding is fun!"))
