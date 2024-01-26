@@ -188,6 +188,22 @@ class BytePairEncoding:
 if __name__ == "__main__":
     # Example usage:
     bpe = BytePairEncoding(n_merges=100)
-    corpus = ["This is a sample text.", "Byte-Pair Encoding is cool!"]
+    corpus = [
+        "This is a sample text.",
+        "Byte-Pair Encoding is cool!",
+        "There is a cool breeze today.",
+    ]
+
+    # Train the BPE model with the corpus
     bpe.train(corpus)
-    print(bpe.tokenize("Encoding is fun!"))
+
+    # Tokenize a new sentence using the trained model
+    tokenized_sentence = bpe.tokenize("Encoding is fun!")
+
+    # Print the tokenized result
+    print("Tokenized Sentence:", tokenized_sentence)
+
+    # Optional: Print additional information for analysis
+    token_frequencies, token_map = bpe.get_token_info()
+    print("\nToken Frequencies:", token_frequencies)
+    print("\nTokenization Map:", token_map)
