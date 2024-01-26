@@ -53,12 +53,20 @@ class BytePairEncoding:
         return self._tokenize_with_vocab(tokens)
 
     def get_token_info(self):
+        """
+        Retrieve token frequency information and tokenization mapping.
+
+        Returns:
+            tuple: A tuple containing two dictionaries - frequency_map and token_map.
+                - frequency_map: A dictionary mapping tokens to their frequencies.
+                - token_map: A dictionary mapping original words to their tokenized representations.
+        """
         frequency_map = collections.defaultdict(int)
         token_map = {}
 
         for word, frequency in self.vocab.items():
-            split_word = word.split()  # use space delimiter
-            original_word = "".join(split_word)  # omit space delimiter
+            split_word = word.split()  # Use space delimiter
+            original_word = "".join(split_word)  # Omit space delimiter
             for token in split_word:
                 frequency_map[token] += frequency
             token_map[original_word] = split_word
@@ -66,15 +74,24 @@ class BytePairEncoding:
         return frequency_map, token_map
 
     def _set_vocab(self, corpus: list[str]) -> None:
+        """
+        Set the vocabulary based on the given corpus.
+
+        Args:
+            corpus (list): List of strings representing the text corpus.
+
+        Raises:
+            ValueError: If corpus is empty or contains non-string elements.
+        """
         if not corpus or not all(isinstance(text, str) for text in corpus):
             raise ValueError("Corpus must be a list of strings.")
 
-        # Ensure vocab is reset upon new corpus
+        # Ensure vocab is reset upon a new corpus
         self.vocab = collections.defaultdict(int)
 
         # Break down corpus into lines.
         for line in corpus:
-            # Break down line into words.
+            # Break down the line into words.
             for word in line.split():
                 # Group space-separated characters by bounding them with a stop token.
                 token = " ".join(list(word)) + self.stop
@@ -82,6 +99,12 @@ class BytePairEncoding:
                 self.vocab[token] += 1
 
     def _get_stats(self):
+        """
+        Calculate token pair frequencies based on the current vocabulary.
+
+        Returns:
+            dict: A dictionary mapping token pairs to their frequencies.
+        """
         pairs = collections.defaultdict(int)
         for token, freq in self.vocab.items():
             symbols = token.split()
@@ -93,13 +116,19 @@ class BytePairEncoding:
         return pairs
 
     def _merge_tokens(self, pair: tuple[str, str]) -> None:
+        """
+        Merge tokens in the vocabulary based on a given pair.
+
+        Args:
+            pair (tuple): A tuple containing two strings representing the pair of tokens to merge.
+        """
         output_vocab = collections.defaultdict(int)
         lookbehind, group, lookahead = r"(?<!\S)", re.escape(" ".join(pair)), r"(?!\S)"
         bigram_pattern = re.compile(lookbehind + group + lookahead)
 
         for token, freq in self.vocab.items():
             merged_token = bigram_pattern.sub("".join(pair), token)
-            # keep an eye on += freq; this might create a subtle bug.
+            # Keep an eye on += freq; this might create a subtle bug.
             output_vocab[merged_token] += freq
 
         self.vocab = output_vocab
