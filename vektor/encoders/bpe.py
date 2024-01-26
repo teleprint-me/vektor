@@ -36,14 +36,14 @@ class BytePairEncoding:
         Args:
             corpus (list): List of strings representing the text corpus.
         """
-        self._set_vocab(corpus)
+        self.set_vocab(corpus)
 
         for _ in range(self.n_merges):
-            pairs = self._get_stats()
+            pairs = self.get_stats()
             if not pairs:
                 break
             best = max(pairs, key=pairs.get)
-            self._merge_tokens(best)
+            self.merge_tokens(best)
 
     def tokenize(self, text):
         """
@@ -59,23 +59,39 @@ class BytePairEncoding:
         tokens = list(text)
         return self._tokenize_with_vocab(tokens)
 
-    def get_token_length(self, token) -> int:
+    def get_token_length(self, token: str) -> int:
+        """
+        Calculate the length of a token, accounting for the stop token if present.
+
+        Args:
+            token (str): The token whose length needs to be calculated.
+
+        Returns:
+            int: The length of the token.
+        """
         if token.endswith(self.stop):
             # Adjust length to account for stop token
             return len(token) - len(self.stop) + 1
-        else:
-            return len(token)
+        return len(token)
 
-    def sort_tokens(self, tokens_frequencies):
+    def sort_tokens(self, tokens_frequencies: Dict[str, int]) -> List[str]:
+        """
+        Sort tokens based on their frequencies and token lengths.
+
+        Args:
+            tokens_frequencies (Dict[str, int]): A dictionary mapping tokens to their frequencies.
+
+        Returns:
+            List[str]: A list of sorted tokens.
+        """
         sorted_tokens_tuple = sorted(
             tokens_frequencies.items(),
-            key=lambda item: (self._get_token_length(item[0]), item[1]),
+            key=lambda item: (self.get_token_length(item[0]), item[1]),
             reverse=True,
         )
-        sorted_tokens = [token for (token, freq) in sorted_tokens_tuple]
-        return sorted_tokens
+        return [token for (token, freq) in sorted_tokens_tuple]
 
-    def get_token_info(self):
+    def get_token_info(self) -> Tuple[Dict[str, int], Dict[str, List[str]]]:
         """
         Retrieve token frequency information and tokenization mapping.
 
@@ -85,7 +101,7 @@ class BytePairEncoding:
                 - token_map: A dictionary mapping original words to their tokenized representations.
         """
         frequency_map = collections.defaultdict(int)
-        token_map = {}
+        token_map: Dict[str, List[str]] = {}
 
         for word, frequency in self.vocab.items():
             split_word = word.split()  # Use space delimiter
@@ -96,7 +112,7 @@ class BytePairEncoding:
 
         return frequency_map, token_map
 
-    def _set_vocab(self, corpus: List[str]) -> None:
+    def set_vocab(self, corpus: List[str]) -> None:
         """
         Set the vocabulary based on the given corpus.
 
@@ -121,7 +137,7 @@ class BytePairEncoding:
                 # Add token to vocab using a unique integer.
                 self.vocab[token] += 1
 
-    def _get_stats(self) -> Dict[Tuple[str, str], int]:
+    def get_stats(self) -> Dict[Tuple[str, str], int]:
         """
         Calculate token pair frequencies based on the current vocabulary.
 
@@ -138,7 +154,7 @@ class BytePairEncoding:
                 pairs[pair] += freq
         return pairs
 
-    def _merge_tokens(self, pair: Tuple[str, str]) -> None:
+    def merge_tokens(self, pair: Tuple[str, str]) -> None:
         """
         Merge tokens in the vocabulary based on a given pair.
 
