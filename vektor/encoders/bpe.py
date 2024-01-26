@@ -19,7 +19,8 @@ class BytePairEncoding:
             num_merges (int): The number of merges to perform during tokenization.
         """
         self.num_merges = num_merges
-        self.vocab = {}  # Initialize the vocabulary
+        self.vocab = collections.defaultdict(int)
+        self.stop = " </w>"
 
     def train(self, corpus):
         """
@@ -28,10 +29,8 @@ class BytePairEncoding:
         Args:
             corpus (list): List of strings representing the text corpus.
         """
-        # Initialize the vocabulary with single characters as tokens
-        self.vocab = {char: freq for text in corpus for char in text}
+        self._set_vocab(corpus)
 
-        # Perform BPE merges for a specified number of iterations
         for _ in range(self.num_merges):
             pairs = self._get_stats()
             if not pairs:
@@ -51,32 +50,61 @@ class BytePairEncoding:
         """
         # Initialize the list of tokens with individual characters
         tokens = list(text)
+        return self._tokenize_with_vocab(tokens)
 
-        # Perform tokenization using the trained vocabulary
-        tokens = self._tokenize_with_vocab(tokens)
+    def get_token_info(self):
+        frequency_map = collections.defaultdict(int)
+        token_map = {}
 
-        return tokens
+        for word, frequency in self.vocab.items():
+            split_word = word.split()  # use space delimiter
+            original_word = "".join(split_word)  # omit space delimiter
+            for token in split_word:
+                frequency_map[token] += frequency
+            token_map[original_word] = split_word
+
+        return frequency_map, token_map
+
+    def _set_vocab(self, corpus: list[str]) -> None:
+        if not corpus or not all(isinstance(text, str) for text in corpus):
+            raise ValueError("Corpus must be a list of strings.")
+
+        # Ensure vocab is reset upon new corpus
+        self.vocab = collections.defaultdict(int)
+
+        # Break down corpus into lines.
+        for line in corpus:
+            # Break down line into words.
+            for word in line.split():
+                # Group space-separated characters by bounding them with a stop token.
+                token = " ".join(list(word)) + self.stop
+                # Add token to vocab using a unique integer.
+                self.vocab[token] += 1
 
     def _get_stats(self):
-        # Calculate token pair frequencies based on the current vocabulary
-        pairs = {}
+        pairs = collections.defaultdict(int)
         for token, freq in self.vocab.items():
             symbols = token.split()
             for i in range(len(symbols) - 1):
-                pair = (symbols[i], symbols[i + 1])
-                pairs[pair] = pairs.get(pair, 0) + freq
+                current_symbol = symbols[i]
+                next_symbol = symbols[i + 1]
+                pair = (current_symbol, next_symbol)
+                pairs[pair] += freq
         return pairs
 
-    def _merge_tokens(self, pair):
-        # Merge the most frequent token pair in the vocabulary
-        token1, token2 = pair
-        merged_token = token1 + token2
-        self.vocab[merged_token] = self.vocab.get(merged_token, 0)
-        del self.vocab[token1]
-        del self.vocab[token2]
+    def _merge_tokens(self, pair: tuple[str, str]) -> None:
+        output_vocab = collections.defaultdict(int)
+        lookbehind, group, lookahead = r"(?<!\S)", re.escape(" ".join(pair)), r"(?!\S)"
+        bigram_pattern = re.compile(lookbehind + group + lookahead)
+
+        for token, freq in self.vocab.items():
+            merged_token = bigram_pattern.sub("".join(pair), token)
+            # keep an eye on += freq; this might create a subtle bug.
+            output_vocab[merged_token] += freq
+
+        self.vocab = output_vocab
 
     def _tokenize_with_vocab(self, tokens):
-        # Tokenize text using the trained vocabulary
         new_tokens = []
         i = 0
         while i < len(tokens):
@@ -87,3 +115,11 @@ class BytePairEncoding:
             new_tokens.append(token)
             i += 1
         return new_tokens
+
+
+if __name__ == "__main__":
+    # Example usage:
+    bpe = BytePairEncoding(num_merges=100)
+    corpus = ["This is a sample text.", "Byte-Pair Encoding is cool!"]
+    bpe.train(corpus)
+    print(bpe.tokenize("Encoding is fun!"))
